@@ -1,0 +1,31 @@
+<h2>Explore Cars</h2>
+<p>Check out the latest cars shared by our community.</p>
+
+<div class="cars-container" id="carsContainer">
+    <div class="car-card">
+        <div class="image-gallery">
+            <button class="prev" onclick="prevImage(this)">&#10094;</button>
+            <img src="./assets/images/audi.jpg" alt="Audi RS7" class="active">
+            <img src="./assets/images/audi2.jpg" alt="Audi Extra">
+            <img src="./assets/images/audi3.jpg" alt="Audi Extra">
+            <img src="./assets/images/audi4.jpg" alt="Audi Extra">
+            <button class="next" onclick="nextImage(this)">&#10095;</button>
+        </div>
+        <h3>Audi RS7</h3>
+        <p>Year: 2021<br> Engine: Twin-Turbo 4.0L V8 <br> Power: 730HP  </p>
+        <button onclick="toggleFavorite(this)">❤️ Favorite</button>
+    </div>
+</div>
+
+<div class="add-car">
+    <h3>Add a New Car</h3>
+    <input type="text" id="carModel" placeholder="Car Model">
+    <input type="number" id="carYear" placeholder="Year">
+    <input type="text" id="engine" placeholder="Engine: ">
+    <input type="text" id="horsepower" placeholder="Horsepower: ">
+
+    <input type="file" id="carImages" accept="image/*" multiple>
+    <button onclick="addNewCar()">➕ Add Car</button>
+</div>
+
+<script src="assets/js/cars.js"></script>

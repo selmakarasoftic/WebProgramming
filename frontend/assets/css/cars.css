@@ -1,0 +1,66 @@
+.car-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    margin-top: 15px;
+}
+
+.car-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.image-gallery {
+    position: relative;
+    width: 100%;
+    height: 200px;
+}
+
+.image-gallery img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    opacity: 0;  
+    position: absolute;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.image-gallery img.active {
+    opacity: 1;
+    position: relative;
+}
+
+.image-gallery .prev, .image-gallery .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 18px;
+    z-index: 10;
+}
+
+.image-gallery .prev {
+    left: 5px;
+}
+
+.image-gallery .next {
+    right: 5px;
+}
+
+.image-gallery .prev:hover, .image-gallery .next:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+ .car-card p, .car-card h3{
+    color: black;
+ }
