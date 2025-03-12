@@ -1,4 +1,4 @@
-.cars-container {
+.reviews-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -6,7 +6,7 @@
     margin-top: 20px;
 }
 
-.car-card {
+.review-card {
     background: white;
     padding: 15px;
     border-radius: 10px;
@@ -20,16 +20,16 @@
     align-items: center;
 }
 
-.car-card:hover {
+.review-card:hover {
     transform: scale(1.02);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.car-card p, .car-card h3 {
+.review-card p, h3 {
     color: rgb(75, 57, 57);
 }
 
-.add-car {
+.add-review {
     margin-top: 30px;
     padding: 20px;
     background: white;
@@ -41,7 +41,7 @@
     text-align: center;
 }
 
-.add-car input, .add-car textarea, .add-car select {
+.add-review input, .add-review textarea, .add-review select {
     width: 90%;
     padding: 10px;
     margin: 8px 0;
@@ -49,7 +49,7 @@
     border-radius: 5px;
 }
 
-.add-car button {
+.add-review button {
     background-color: #008CBA;
     color: white;
     padding: 10px 15px;
@@ -59,15 +59,22 @@
     transition: background 0.3s ease;
 }
 
-.add-car button:hover {
+.add-review button:hover {
     background-color: #005f7a;
 }
 
-/* Image Gallery */
+.add-review h3 {
+    color: white;
+}
+
+.add-review p {
+    color: darkred;
+}
+
 .image-gallery {
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 200px;
     overflow: hidden;
     border-radius: 10px;
 }
@@ -111,13 +118,13 @@
 }
 
 @media (max-width: 1024px) {
-    .car-card {
+    .review-card {
         width: calc(50% - 20px);
     }
 }
 
 @media (max-width: 768px) {
-    .car-card {
+    .review-card {
         width: 100%;
     }
 }

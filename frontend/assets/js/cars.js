@@ -14,7 +14,7 @@ function prevImage(button) {
     let images = gallery.querySelectorAll("img");
     let index = Array.from(images).findIndex(img => img.classList.contains("active"));
 
-    if (index === -1 || images.length === 0) return; 
+    if (index === -1 || images.length === 0) return;
 
     images[index].classList.remove("active");
     index = (index - 1 + images.length) % images.length;
@@ -26,7 +26,7 @@ function nextImage(button) {
     let images = gallery.querySelectorAll("img");
     let index = Array.from(images).findIndex(img => img.classList.contains("active"));
 
-    if (index === -1 || images.length === 0) return; 
+    if (index === -1 || images.length === 0) return;
 
     images[index].classList.remove("active");
     index = (index + 1) % images.length;
@@ -72,7 +72,7 @@ function addNewCar() {
             img.src = event.target.result;
 
             if (!firstImageSet) {
-                img.classList.add("active"); // First image is visible
+                img.classList.add("active");
                 firstImageSet = true;
             }
 
@@ -89,11 +89,10 @@ function addNewCar() {
                              <p>Engine: ${engine}</p>
                              <p>Horsepower: ${horsepower}</p>
                              <button onclick="toggleFavorite(this)">❤️ Favorite</button>`;
-        newCar.insertBefore(galleryDiv, newCar.firstChild); 
+        newCar.insertBefore(galleryDiv, newCar.firstChild);
         carContainer.appendChild(newCar);
     }, 500);
 
-    // Clear input fields
     document.getElementById("carModel").value = "";
     document.getElementById("carYear").value = "";
     document.getElementById("engine").value = "";
