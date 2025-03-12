@@ -11,10 +11,10 @@ function initHome() {
     const highlightsContainer = document.getElementById("latestHighlights");
 
     if (user && user.role === "admin") {
-        welcomeMessage.innerHTML = `Welcome back, Admin ${user.username}! 👑`;
+        welcomeMessage.innerHTML = `Welcome back, Admin ${user.username}! `;
         adminInfo.style.display = "block";
     } else {
-        welcomeMessage.innerHTML = `Welcome, Guest! 🚗`;
+        welcomeMessage.innerHTML = `Welcome, Guest! `;
         adminInfo.style.display = "none";
     }
 
