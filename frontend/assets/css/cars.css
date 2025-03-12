@@ -11,7 +11,7 @@
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    transition: 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: calc(33.33% - 20px);
     min-width: 300px;
     max-width: 400px;
@@ -21,11 +21,12 @@
 }
 
 .car-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
 }
 
-.car-card p, .car-card h3 {
+.car-card h3, 
+.car-card p {
     color: #ccc;
     text-align: center;
 }
@@ -131,6 +132,7 @@
 .image-gallery .prev:hover, .image-gallery .next:hover {
     background: rgba(0, 0, 0, 0.8);
 }
+
 .delete-btn {
     background-color: #e74c3c;
     color: white;

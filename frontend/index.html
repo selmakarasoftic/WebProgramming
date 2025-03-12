@@ -6,22 +6,32 @@
     <title>Car Enthusiasts Hub</title>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/cars.css">
+
+
+    <script>
+        // Automatsko preusmeravanje na login ako korisnik nije prijavljen
+        const user = localStorage.getItem("loggedInUser");
+        if (!user) {
+            window.location.href = "pages/login.html";
+        }
+    </script>
 </head>
 <body>
+
     <header>
         <h1>AutoVerse</h1>
-            <nav class="main-nav">
-                <a href="#home">Home</a>
-                <a href="#cars">Cars</a>
-                <a href="#meetups">Meetups</a>
-            </nav>
-            
-            <nav class="sub-nav">
-                <a href="#reviews">Reviews</a>
-                <a href="#profile">Profile</a>
-                <a href="pages/login.html">Logout</a>
-            </nav>
-            
+        <nav class="main-nav">
+            <a href="#home">Home</a>
+            <a href="#cars">Cars</a>
+            <a href="#meetups">Meetups</a>
+        </nav>
+
+        <nav class="sub-nav">
+            <a href="#reviews">Reviews</a>
+            <a href="#profile">Profile</a>
+            <a href="#" onclick="logoutUser()">Logout</a>
+        </nav>
     </header>
 
     <main id="content"></main>
@@ -35,6 +45,12 @@
     <script src="assets/js/register.js"></script>
     <script src="assets/js/profile.js"></script>
 
+    <script>
+        function logoutUser() {
+            localStorage.removeItem("loggedInUser");
+            window.location.href = "pages/login.html";
+        }
+    </script>
 
 </body>
 </html>

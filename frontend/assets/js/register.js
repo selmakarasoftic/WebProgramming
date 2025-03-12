@@ -26,6 +26,6 @@ function registerUser() {
 
     message.textContent = "Registration successful! Redirecting...";
     message.style.color = "green";
-    
+
     setTimeout(() => window.location.href = "../index.html#home", 1000);
 }

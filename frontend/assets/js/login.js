@@ -1,3 +1,17 @@
+function initializeUsers() {
+    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+    if (existingUsers.length === 0) {
+        const defaultUsers = [
+            { username: "selma", password: "password", role: "admin", registered: "2024-01-01" },
+            { username: "guest4", password: "password", role: "guest", registered: "2024-02-01" }
+        ];
+        localStorage.setItem("users", JSON.stringify(defaultUsers));
+    }
+}
+
+document.addEventListener("DOMContentLoaded", initializeUsers);
+
 function loginUser() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
