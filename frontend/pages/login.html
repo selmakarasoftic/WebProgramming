@@ -1,6 +1,26 @@
-<h2>Login</h2>
-<form onsubmit="alert('login na kraju!'); return false;">
-    <input type="email" placeholder="Enter your email" required>
-    <input type="password" placeholder="Enter your password" required>
-    <button type="submit">Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AutoVerse</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to AutoVerse</h2>
+
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="loginUser()">Login</button>
+
+        <p id="loginMessage"></p>
+
+        <p class="register-link">
+            Don't have an account? <a href="#" onclick="redirectToRegister()">Register here</a>
+        </p>
+    </div>
+
+    <script src="../assets/js/login.js"></script>
+</body>
+</html>

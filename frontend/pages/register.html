@@ -1,7 +1,31 @@
-<h2>Register</h2>
-<form onsubmit="alert('i ovo na kraju '); return false;">
-    <input type="text" placeholder="Enter your username" required>
-    <input type="email" placeholder="Enter your email" required>
-    <input type="password" placeholder="Enter your password" required>
-    <button type="submit">Register</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AutoVerse</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/register.css">
+</head>
+<body>
+
+    
+    <div class="register-container">
+        <h2>🔐 Register for AutoVerse</h2>
+        <input type="text" id="registerUsername" placeholder="Username">
+        <input type="password" id="registerPassword" placeholder="Password">
+        <select id="registerRole">
+            <option value="guest">Guest</option>
+        </select>
+        <button onclick="registerUser()">Register</button>
+    </div>
+
+    <p id="registerMessage"></p>
+
+    <p class="login-link">
+        Already have an account? <a href="#" onclick="redirectToLogin()">Login here</a>
+    </p>
+
+    <script src="../assets/js/register.js"></script>
+</body>
+</html>

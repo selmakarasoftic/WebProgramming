@@ -1,101 +1,97 @@
-function toggleFavorite(button) {
-    if (button.classList.contains("favorited")) {
-        button.innerHTML = "❤️ Favorite";
-        button.style.backgroundColor = "#ff4d4d";
-    } else {
-        button.innerHTML = "💖 Favorited!";
-        button.style.backgroundColor = "#00C851";
+const cars = [
+    {
+        model: "Audi RS7",
+        year: "2021",
+        engine: "Twin-Turbo 4.0L V8",
+        horsepower: "730HP",
+        images: [
+            "assets/images/audi.jpg",
+            "assets/images/audi2.jpg",
+            "assets/images/audi3.jpg",
+            "assets/images/audi4.jpg"
+        ]
     }
-    button.classList.toggle("favorited");
-}
+];
 
-function prevImage(button) {
-    let gallery = button.parentElement;
-    let images = gallery.querySelectorAll("img");
-    let index = Array.from(images).findIndex(img => img.classList.contains("active"));
-
-    if (index === -1 || images.length === 0) return;
-
-    images[index].classList.remove("active");
-    index = (index - 1 + images.length) % images.length;
-    images[index].classList.add("active");
-}
-
-function nextImage(button) {
-    let gallery = button.parentElement;
-    let images = gallery.querySelectorAll("img");
-    let index = Array.from(images).findIndex(img => img.classList.contains("active"));
-
-    if (index === -1 || images.length === 0) return;
-
-    images[index].classList.remove("active");
-    index = (index + 1) % images.length;
-    images[index].classList.add("active");
-}
-
-function addNewCar() {
-    let model = document.getElementById("carModel").value;
-    let year = document.getElementById("carYear").value;
-    let engine = document.getElementById("engine").value;
-    let horsepower = document.getElementById("horsepower").value;
-    let imageInput = document.getElementById("carImages");
-
-    if (!model || !year || !engine || !horsepower || imageInput.files.length === 0) {
-        alert("Please fill out all fields and upload at least one image!");
-        return;
+function initCars() {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (user && user.role !== "admin") {
+        document.getElementById("addCarForm").style.display = "none";
     }
+    renderCars();
+}
 
-    let carContainer = document.getElementById("carsContainer");
-    let newCar = document.createElement("div");
-    newCar.classList.add("car-card");
+function renderCars() {
+    const container = document.getElementById("carsContainer");
+    container.innerHTML = "";
 
-    let galleryDiv = document.createElement("div");
-    galleryDiv.classList.add("image-gallery");
+    cars.forEach((car, index) => {
+        const card = document.createElement("div");
+        card.classList.add("car-card");
 
-    let prevBtn = document.createElement("button");
-    prevBtn.classList.add("prev");
-    prevBtn.innerHTML = "&#10094;";
-    prevBtn.onclick = function () { prevImage(prevBtn); };
+        const galleryDiv = document.createElement("div");
+        galleryDiv.classList.add("image-gallery");
 
-    let nextBtn = document.createElement("button");
-    nextBtn.classList.add("next");
-    nextBtn.innerHTML = "&#10095;";
-    nextBtn.onclick = function () { nextImage(nextBtn); };
-
-    galleryDiv.appendChild(prevBtn);
-
-    let firstImageSet = false;
-    for (let file of imageInput.files) {
-        let reader = new FileReader();
-        reader.onload = function (event) {
-            let img = document.createElement("img");
-            img.src = event.target.result;
-
-            if (!firstImageSet) {
-                img.classList.add("active");
-                firstImageSet = true;
-            }
-
+        car.images.forEach((imgSrc, idx) => {
+            const img = document.createElement("img");
+            img.src = imgSrc;
+            if (idx === 0) img.classList.add("active");
             galleryDiv.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    }
+        });
 
-    galleryDiv.appendChild(nextBtn);
+        const prevBtn = document.createElement("button");
+        prevBtn.classList.add("prev");
+        prevBtn.innerHTML = "&#10094;";
+        prevBtn.onclick = () => prevImage(galleryDiv);
 
-    setTimeout(() => {
-        newCar.innerHTML += `<h3>${model}</h3>
-                             <p>Year: ${year}</p>
-                             <p>Engine: ${engine}</p>
-                             <p>Horsepower: ${horsepower}</p>
-                             <button onclick="toggleFavorite(this)">❤️ Favorite</button>`;
-        newCar.insertBefore(galleryDiv, newCar.firstChild);
-        carContainer.appendChild(newCar);
-    }, 500);
+        const nextBtn = document.createElement("button");
+        nextBtn.classList.add("next");
+        nextBtn.innerHTML = "&#10095;";
+        nextBtn.onclick = () => nextImage(galleryDiv);
 
-    document.getElementById("carModel").value = "";
-    document.getElementById("carYear").value = "";
-    document.getElementById("engine").value = "";
-    document.getElementById("horsepower").value = "";
-    document.getElementById("carImages").value = "";
+        galleryDiv.appendChild(prevBtn);
+        galleryDiv.appendChild(nextBtn);
+
+        card.innerHTML = `
+            <h3>${car.model}</h3>
+            <p>Year: ${car.year}</p>
+            <p>Engine: ${car.engine}</p>
+            <p>Horsepower: ${car.horsepower}</p>
+        `;
+
+        const user = JSON.parse(localStorage.getItem("loggedInUser"));
+        if (user && user.role === "admin") {
+            const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("delete-btn");
+            deleteBtn.textContent = "🗑️ Delete";
+            deleteBtn.onclick = () => {
+                cars.splice(index, 1);
+                renderCars();
+            };
+            card.appendChild(deleteBtn);
+        }
+
+        card.insertBefore(galleryDiv, card.firstChild);
+        container.appendChild(card);
+    });
+}
+
+function prevImage(gallery) {
+    const images = gallery.querySelectorAll("img");
+    const activeImage = gallery.querySelector("img.active");
+    let currentIndex = Array.from(images).indexOf(activeImage);
+
+    activeImage.classList.remove("active");
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    images[currentIndex].classList.add("active");
+}
+
+function nextImage(gallery) {
+    const images = gallery.querySelectorAll("img");
+    const activeImage = gallery.querySelector("img.active");
+    let currentIndex = Array.from(images).indexOf(activeImage);
+
+    activeImage.classList.remove("active");
+    currentIndex = (currentIndex + 1) % images.length;
+    images[currentIndex].classList.add("active");
 }

@@ -7,52 +7,67 @@
 }
 
 .review-card {
-    background: white;
-    padding: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     width: calc(33.33% - 20px);
     min-width: 280px;
     max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: 0.3s ease;
 }
 
 .review-card:hover {
     transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
 }
 
-.review-card p, h3 {
-    color: rgb(75, 57, 57);
+.review-card h3 {
+    color: #00C851;
+    margin-bottom: 10px;
+}
+
+.review-card p {
+    color: #ccc;
+    margin: 5px 0;
 }
 
 .add-review {
     margin-top: 30px;
-    padding: 20px;
-    background: white;
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.7);
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
 }
 
-.add-review input, .add-review textarea, .add-review select {
+.add-review input,
+.add-review textarea,
+.add-review select {
     width: 90%;
-    padding: 10px;
+    padding: 12px;
     margin: 8px 0;
-    border: 1px solid #ddd;
+    border: 1px solid #444;
     border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.add-review input::placeholder,
+.add-review textarea::placeholder {
+    color: #ccc;
 }
 
 .add-review button {
-    background-color: #008CBA;
+    background-color: #00C851;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -60,11 +75,11 @@
 }
 
 .add-review button:hover {
-    background-color: #005f7a;
+    background-color: #007e3a;
 }
 
 .add-review h3 {
-    color: white;
+    color: #00C851;
 }
 
 .add-review p {
@@ -92,7 +107,8 @@
     display: block;
 }
 
-.image-gallery .prev, .image-gallery .next {
+.image-gallery .prev,
+.image-gallery .next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -113,8 +129,24 @@
     right: 5px;
 }
 
-.image-gallery .prev:hover, .image-gallery .next:hover {
+.image-gallery .prev:hover,
+.image-gallery .next:hover {
     background: rgba(0, 0, 0, 0.8);
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
 }
 
 @media (max-width: 1024px) {
