@@ -1,4 +1,5 @@
-const cars = [
+// Load cars from localStorage or use default array
+const defaultCars = [
     {
         model: "Audi RS7",
         year: "2021",
@@ -13,22 +14,30 @@ const cars = [
     }
 ];
 
+const cars = JSON.parse(localStorage.getItem("cars")) || defaultCars;
+
+// Initialize Cars Page
 function initCars() {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (user && user.role !== "admin") {
-        document.getElementById("addCarForm").style.display = "none";
+        const form = document.getElementById("addCarForm");
+        if (form) form.style.display = "none";
     }
     renderCars();
 }
 
+// Render Cars to DOM
 function renderCars() {
     const container = document.getElementById("carsContainer");
+    if (!container) return;
+    
     container.innerHTML = "";
 
     cars.forEach((car, index) => {
         const card = document.createElement("div");
         card.classList.add("car-card");
 
+        // Create Image Gallery
         const galleryDiv = document.createElement("div");
         galleryDiv.classList.add("image-gallery");
 
@@ -66,6 +75,7 @@ function renderCars() {
             deleteBtn.textContent = "🗑️ Delete";
             deleteBtn.onclick = () => {
                 cars.splice(index, 1);
+                localStorage.setItem("cars", JSON.stringify(cars));
                 renderCars();
             };
             card.appendChild(deleteBtn);
@@ -76,6 +86,7 @@ function renderCars() {
     });
 }
 
+// Navigate to previous image
 function prevImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -86,6 +97,7 @@ function prevImage(gallery) {
     images[currentIndex].classList.add("active");
 }
 
+// Navigate to next image
 function nextImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -95,3 +107,11 @@ function nextImage(gallery) {
     currentIndex = (currentIndex + 1) % images.length;
     images[currentIndex].classList.add("active");
 }
+
+// Ensure render after SPApp has loaded the section
+$(document).on("spapp:ready", function () {
+    if (window.location.hash === "#cars") {
+        initCars();
+    }
+});
+

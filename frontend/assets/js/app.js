@@ -1,54 +1,64 @@
-// Funkcija za učitavanje stranica
-function loadPage(page) {
-    fetch(`pages/${page}.html`)
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById("content").innerHTML = data;
+$(document).ready(function () {
+    // Initialize SPApp once
+    const app = $.spapp({
+        templateDir: "./pages/",
+        defaultView: "home",
+        pageNotFound: "404"
+    });
 
-            //inicijalizujem stranice
-            if (page === "home") {
-                initHome();
-            } else if (page === "cars") {
-                initCars();
-            } else if (page === "reviews") {
-                initReviews();
-            } else if (page === "meetups") {
-                initMeetups();
-            } else if (page === "profile") {
-                initProfile();
-            }
-        })
-        .catch(error => console.error("Error loading page:", error));
-}
+    // Home Route
+    app.route({
+        view: "home",
+        load: "home.html",
+        onReady: function () {
+            if (typeof initHome === "function") initHome();
+        }
+    });
 
-//ovo mi je za hash
-function handleHashChange() {
-    const user = localStorage.getItem("loggedInUser");
+    // Cars Route
+    app.route({
+        view: "cars",
+        load: "cars.html",
+        onReady: function () {
+            if (typeof initCars === "function") initCars();
+        }
+    });
 
-    if (!user) {
-        window.location.href = "pages/login.html";
-        return;
-    }
+    // Reviews Route
+    app.route({
+        view: "reviews",
+        load: "reviews.html",
+        onReady: function () {
+            if (typeof initReviews === "function") initReviews();
+        }
+    });
 
-    const page = window.location.hash.substring(1) || "home";
-    loadPage(page);
-}
+    // Meetups Route
+    app.route({
+        view: "meetups",
+        load: "meetups.html",
+        onReady: function () {
+            if (typeof initMeetups === "function") initMeetups();
+        }
+    });
 
-function logoutUser() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "pages/login.html";
-}
+    // Profile Route
+    app.route({
+        view: "profile",
+        load: "profile.html",
+        onReady: function () {
+            if (typeof initProfile === "function") initProfile();
+        }
+    });
+    app.route({
+        view: "admin",
+        load: "pages/admin.html",
+        onReady: function () {
+            initAdminPage();
+        }
+    });
+    
 
-document.addEventListener("DOMContentLoaded", () => {
-    const user = localStorage.getItem("loggedInUser");
-
-    if (!user) {
-        window.location.href = "pages/login.html";
-    } else {
-        // ako ima hash-a ucitaj page ako nema - home
-        const page = window.location.hash.substring(1) || "home";
-        loadPage(page);
-    }
+    // Run the SPA only once
+    app.run();
 });
-
-window.addEventListener("hashchange", handleHashChange);

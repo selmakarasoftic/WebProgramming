@@ -1,4 +1,4 @@
-const reviews = [
+const defaultReviews = [
     {
         title: "Audi RS7 Review",
         name: "Selma",
@@ -12,18 +12,27 @@ const reviews = [
     }
 ];
 
-function initReviews() {
+// Load reviews from localStorage or use default ones
+const reviews = JSON.parse(localStorage.getItem("reviews")) || defaultReviews;
+
+// Initialize Reviews Section
+window.initReviews = function () {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    
-    if (user && user.role !== "admin") {
-        document.getElementById("addReviewForm").style.display = "none";
+
+    // Hide add form for non-admins
+    const form = document.getElementById("addReviewForm");
+    if (form && user && user.role !== "admin") {
+        form.style.display = "none";
     }
-    
+
     renderReviews();
 }
 
+// Render Reviews to DOM
 function renderReviews() {
     const container = document.getElementById("reviewsContainer");
+    if (!container) return;
+
     container.innerHTML = "";
 
     reviews.forEach((review, index) => {
@@ -43,12 +52,12 @@ function renderReviews() {
         const prevBtn = document.createElement("button");
         prevBtn.classList.add("prev");
         prevBtn.innerHTML = "&#10094;";
-        prevBtn.onclick = () => prevImage(prevBtn);
+        prevBtn.onclick = () => prevImage(galleryDiv);
 
         const nextBtn = document.createElement("button");
         nextBtn.classList.add("next");
         nextBtn.innerHTML = "&#10095;";
-        nextBtn.onclick = () => nextImage(nextBtn);
+        nextBtn.onclick = () => nextImage(galleryDiv);
 
         galleryDiv.appendChild(prevBtn);
         galleryDiv.appendChild(nextBtn);
@@ -67,6 +76,7 @@ function renderReviews() {
             deleteBtn.textContent = "🗑️ Delete";
             deleteBtn.onclick = () => {
                 reviews.splice(index, 1);
+                localStorage.setItem("reviews", JSON.stringify(reviews));
                 renderReviews();
             };
             card.appendChild(deleteBtn);
@@ -77,49 +87,71 @@ function renderReviews() {
     });
 }
 
-function prevImage(button) {
-    const gallery = button.parentElement;
+// Navigate to Previous Image
+function prevImage(gallery) {
     const images = gallery.querySelectorAll("img");
-    let index = Array.from(images).findIndex(img => img.classList.contains("active"));
+    const activeImage = gallery.querySelector("img.active");
+    let currentIndex = Array.from(images).indexOf(activeImage);
 
-    if (index === -1 || images.length === 0) return;
-
-    images[index].classList.remove("active");
-    index = (index - 1 + images.length) % images.length;
-    images[index].classList.add("active");
+    activeImage.classList.remove("active");
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    images[currentIndex].classList.add("active");
 }
 
-function nextImage(button) {
-    const gallery = button.parentElement;
+// Navigate to Next Image
+function nextImage(gallery) {
     const images = gallery.querySelectorAll("img");
-    let index = Array.from(images).findIndex(img => img.classList.contains("active"));
+    const activeImage = gallery.querySelector("img.active");
+    let currentIndex = Array.from(images).indexOf(activeImage);
 
-    if (index === -1 || images.length === 0) return;
-
-    images[index].classList.remove("active");
-    index = (index + 1) % images.length;
-    images[index].classList.add("active");
+    activeImage.classList.remove("active");
+    currentIndex = (currentIndex + 1) % images.length;
+    images[currentIndex].classList.add("active");
 }
 
-function addReview() {
+// Convert Image to Base64
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+// Add a New Review
+window.addReview = async function () {
     const name = document.getElementById("reviewerName").value;
     const title = document.getElementById("reviewTitle").value;
     const content = document.getElementById("reviewContent").value;
     const rating = document.getElementById("reviewRating").value;
-    const images = Array.from(document.getElementById("reviewImages").files).map(file => URL.createObjectURL(file));
+    const imageInput = document.getElementById("reviewImages");
 
-    if (!name || !title || !content || images.length === 0) {
+    if (!name || !title || !content || imageInput.files.length === 0) {
         alert("Please fill out all fields and upload at least one image!");
         return;
     }
 
+    const images = await Promise.all(
+        Array.from(imageInput.files).map(file => toBase64(file))
+    );
+
     reviews.push({ name, title, content, rating, images });
+    localStorage.setItem("reviews", JSON.stringify(reviews));
     renderReviews();
 
-    // Reset inputs
+    // Reset Inputs
     document.getElementById('reviewerName').value = '';
     document.getElementById('reviewTitle').value = '';
     document.getElementById('reviewContent').value = '';
     document.getElementById('reviewRating').value = '5';
     document.getElementById('reviewImages').value = '';
 }
+
+// Ensure reviews render after SPApp has loaded the section
+$(document).on("spapp:ready", function () {
+    if (window.location.hash === "#reviews") {
+        initReviews();
+    }
+});
+xamp

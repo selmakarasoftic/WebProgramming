@@ -50,7 +50,7 @@ function changePassword() {
 }
 function logoutUser() {
     localStorage.removeItem("loggedInUser");
-    window.location.href = "../index.html#login";
+    window.location.href = "pages/login.html";
 }
 
 function deleteAccount() {
