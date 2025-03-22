@@ -4,49 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoVerse - SPA</title>
-    <script src="assets/js/cars.js"></script>
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/spapp.css">
 </head>
 <body>
-
+    
     <div id="app" style="display: none;">
         <header>
             <h1>AutoVerse</h1>
-            <nav class="main-nav">
-                <a href="#home">Home</a>
-                <a href="#cars">Cars</a>
-                <a href="#reviews">Reviews</a>
-                <a href="#meetups">Meetups</a>
-                <a href="#profile">Profile</a>
-                <a href="#admin" id="adminLink" style="display: none;">Admin Panel</a>
-                <a href="#" onclick="logoutUser()">Logout</a>
-            </nav>
-        </header>
+            <div class="nav-container">
+                <nav class="nav-grid">
+                    <a href="#home">Home</a>
+                    <a href="#cars">Cars</a>
+                    <a href="#reviews">Reviews</a>
+                    <a href="#meetups">Meetups</a>
+                    <a href="#profile">Profile</a>
+                    <a href="#users" id="adminLink">Admin Panel</a>
+                    <a href="#gallery">Gallery</a>
+                    <a href="#" onclick="logoutUser()">Logout</a>
+                </div>
+            </div>
+            
+        </div>
+        
+    </header>
+    
+    <main id="spapp">
+        <section id="home" data-load="pages/home.html"></section>
+        <section id="cars" data-load="pages/cars.html"></section>
+        <section id="reviews" data-load="pages/reviews.html"></section>
+        <section id="meetups" data-load="pages/meetups.html"></section>
+        <section id="profile" data-load="pages/profile.html"></section>
+        <section id="users" data-load="pages/users.html"></section>
+        <section id="gallery" data-load="pages/gallery.html"></section>
+        
+    </main>
+</div>
 
-        <main id="spapp">
-            <section id="home" data-load="pages/home.html"></section>
-            <section id="cars" data-load="pages/cars.html"></section>
-            <section id="reviews" data-load="pages/reviews.html"></section>
-            <section id="meetups" data-load="pages/meetups.html"></section>
-            <section id="profile" data-load="pages/profile.html"></section>
-            <section id="admin" data-load="pages/admin.html"></section>
-        </main>
-    </div>
-
-    <!-- Load jQuery first -->
+<!-- Load jQuery first -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Then load your other scripts -->
 <script src="assets/js/jquery.spapp.min.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/custom.js"></script>
-<script src="assets/js/cars.js"></script>
+<script src="assets/js/users.js"></script>
 <script src="assets/js/login.js"></script>
 <script src="assets/js/reviews.js"></script>
 <script src="assets/js/meetups.js"></script>
 <script src="assets/js/home.js"></script>
 <script src="assets/js/profile.js"></script>
-<script src="assets/js/admin.js"></script>
+<script src="assets/js/cars.js"></script>
+
 </body>
 </html>

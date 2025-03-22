@@ -7,6 +7,7 @@ header {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 header::before {
@@ -21,7 +22,7 @@ header::before {
 }
 
 header h1,
-nav {
+.nav-container {
   position: relative;
   z-index: 2;
 }
@@ -33,32 +34,100 @@ header h1 {
   margin-bottom: 10px;
 }
 
-.main-nav,
-.sub-nav {
+.nav-container {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  align-items: center;
+  width: 100%;
   padding: 10px;
 }
 
-.main-nav a,
-.sub-nav a {
+.nav-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 80%;
+  gap: 15px;
+}
+
+.nav-grid a {
   color: white;
   text-decoration: none;
   padding: 12px 20px;
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
   font-weight: bold;
-  transition: 0.3s ease;
+  transition: background 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+  display: inline-block;
 }
 
-.main-nav a:hover,
-.sub-nav a:hover {
+.nav-grid a:hover {
   background-color: rgba(255, 255, 255, 0.4);
 }
 
+@media (max-width: 1024px) {
+  .nav-grid {
+    max-width: 90%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+  .nav-grid a {
+    padding: 10px 16px; 
+  }
+}
+
+@media (max-width: 425px) {
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+  .nav-grid a {
+    padding: 8px 14px; 
+    font-size: 14px; 
+  }
+}
+
+@media (max-width: 375px) {
+  .nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .nav-grid a {
+    width: 80%;
+    
+    margin: auto;
+    padding: 6px 12px; 
+    font-size: 13px; 
+  }
+}
+@media (max-width: 320px) {
+  .nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .nav-grid a {
+    width: 80%;
+    
+    margin: auto;
+    padding: 6px 12px; 
+    font-size: 13px; 
+  }
+}
+
 body {
-  background: url('../images/bacgroundPage.jpg') no-repeat center center fixed;
+  background: url('../images/backgroundPage.jpg') no-repeat center center fixed;
   background-size: cover;
   margin: 0;
   padding: 0;
@@ -68,7 +137,7 @@ body {
 
 body::before {
   content: "";
-  position: fixed; /*ovo mi treba da bi crni shadow coverao sav page */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;

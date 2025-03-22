@@ -9,11 +9,15 @@
 <body>
 
     <div class="login-container">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
+        <h2>🔑 Login to AutoVerse</h2>
+        <input type="text" id="loginInput" placeholder="Username or Email">
+        <input type="password" id="loginPassword" placeholder="Password">
         <button onclick="loginUser()">Login</button>
         <p id="loginMessage"></p>
+        
+            <p class="register-link">
+                Don't have an account? <a href="register.html" onclick="redirectToRegister()">Register here</a>
+            </p>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -1,22 +1,37 @@
 $(document).ready(function () {
-    const user = localStorage.getItem("loggedInUser");
+    const user = JSON.parse(localStorage.getItem("loggedInUser")); // Parse the user
 
-    // ❌ If not logged in, redirect to login page immediately
     if (!user) {
         window.location.href = "pages/login.html";
     } else {
-        // ✅ If logged in, show the app
-        $("#app").show();
+        const appDiv = document.getElementById("app");
+        if (appDiv) {
+            appDiv.style.display = "block";
+        }
 
-        // If no hash, go to home by default
         if (!window.location.hash || window.location.hash === "#") {
             window.location.hash = "#home";
         }
+
+        checkAdminMenu();
     }
 });
 
-// ✅ Logout Function
 function logoutUser() {
     localStorage.removeItem("loggedInUser");
-    window.location.href = "pages/login.html";
+    window.location.href = "pages/login.html"; 
 }
+function checkAdminMenu() {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const adminLink = document.getElementById("adminLink"); 
+
+    if (adminLink) {
+        if (!user || user.role !== "admin") {
+            adminLink.style.display = "none"; 
+        } else {
+            adminLink.style.display = "inline-block"; 
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", checkAdminMenu);

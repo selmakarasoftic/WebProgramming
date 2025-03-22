@@ -32,7 +32,6 @@
 }
 
 .car-card button {
-    background-color: #008CBA;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -133,7 +132,7 @@
     background: rgba(0, 0, 0, 0.8);
 }
 
-.delete-btn {
+.delete-btn-cars {
     background-color: #e74c3c;
     color: white;
     padding: 8px 12px;
@@ -144,7 +143,7 @@
     transition: background 0.3s ease;
 }
 
-.delete-btn:hover {
+.delete-btn-cars:hover {
     background-color: #c0392b;
 }
 

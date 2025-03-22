@@ -134,7 +134,7 @@
     background: rgba(0, 0, 0, 0.8);
 }
 
-.delete-btn {
+.delete-btn-review {
     background-color: #e74c3c;
     color: white;
     padding: 8px 12px;
@@ -142,10 +142,11 @@
     border-radius: 5px;
     cursor: pointer;
     margin-top: 10px;
+    
     transition: background 0.3s ease;
 }
 
-.delete-btn:hover {
+.delete-btn-review:hover {
     background-color: #c0392b;
 }
 

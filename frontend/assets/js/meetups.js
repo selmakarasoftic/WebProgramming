@@ -1,18 +1,20 @@
-// Default meetup events
 const defaultMeetups = [
     {
         title: "Movie Night na otvorenom",
         date: "2024-07-15",
         location: "Sarajevo",
         description: "Organizator: SFC. Pridružite se večernjem gledanju filmova pod zvezdanim nebom!",
-        createdBy: "System" // Default event created by the system
+        createdBy: "System"
     }
 ];
 
-// Load meetups from localStorage or use default ones
-const meetups = JSON.parse(localStorage.getItem("meetups")) || defaultMeetups;
+let meetups = JSON.parse(localStorage.getItem("meetups"));
 
-// Initialize Meetups Section
+if (!meetups || meetups.length === 0) {
+    meetups = defaultMeetups;
+    localStorage.setItem("meetups", JSON.stringify(meetups));
+}
+
 window.initMeetups = function () {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
 
@@ -24,7 +26,6 @@ window.initMeetups = function () {
     renderMeetups();
 };
 
-// Add New Meetup
 window.addMeetup = function () {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user) {
@@ -47,21 +48,19 @@ window.addMeetup = function () {
         date, 
         location, 
         description, 
-        createdBy: user.username // Store the username of the creator
+        createdBy: user.username 
     };
     
     meetups.push(newMeetup);
     localStorage.setItem("meetups", JSON.stringify(meetups));
     renderMeetups();
 
-    // Reset input fields
     document.getElementById("meetupTitle").value = "";
     document.getElementById("meetupDate").value = "";
     document.getElementById("meetupLocation").value = "";
     document.getElementById("meetupDescription").value = "";
 };
 
-// Render Meetups
 function renderMeetups() {
     const container = document.getElementById("meetupsContainer");
     if (!container) return;
@@ -85,11 +84,7 @@ function renderMeetups() {
             const deleteBtn = document.createElement("button");
             deleteBtn.classList.add("delete-btn");
             deleteBtn.textContent = "🗑️ Delete";
-            deleteBtn.onclick = () => {
-                meetups.splice(index, 1);
-                localStorage.setItem("meetups", JSON.stringify(meetups));
-                renderMeetups();
-            };
+            deleteBtn.onclick = () => deleteMeetup(index);
 
             const editBtn = document.createElement("button");
             editBtn.classList.add("edit-btn");
@@ -104,7 +99,15 @@ function renderMeetups() {
     });
 }
 
-// Edit Meetup
+function deleteMeetup(index) {
+    const confirmDelete = confirm(`Are you sure you want to delete '${meetups[index].title}'?`);
+    if (!confirmDelete) return;
+
+    meetups.splice(index, 1);
+    localStorage.setItem("meetups", JSON.stringify(meetups));
+    renderMeetups();
+}
+
 function editMeetup(index) {
     const meetup = meetups[index];
     const newTitle = prompt("Edit Title:", meetup.title);
@@ -118,7 +121,7 @@ function editMeetup(index) {
             date: newDate,
             location: newLocation,
             description: newDescription,
-            createdBy: meetup.createdBy // Preserve the original creator
+            createdBy: meetup.createdBy
         };
 
         localStorage.setItem("meetups", JSON.stringify(meetups));
@@ -126,7 +129,7 @@ function editMeetup(index) {
     }
 }
 
-// Ensure render after SPApp has loaded the section
+// ✅ Ensure render after SPApp has loaded the section
 $(document).on("spapp:ready", function () {
     if (window.location.hash === "#meetups") {
         initMeetups();

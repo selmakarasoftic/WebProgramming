@@ -15,11 +15,9 @@ const defaultReviews = [
 // Load reviews from localStorage or use default ones
 const reviews = JSON.parse(localStorage.getItem("reviews")) || defaultReviews;
 
-// Initialize Reviews Section
 window.initReviews = function () {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
 
-    // Hide add form for non-admins
     const form = document.getElementById("addReviewForm");
     if (form && user && user.role !== "admin") {
         form.style.display = "none";
@@ -28,7 +26,6 @@ window.initReviews = function () {
     renderReviews();
 }
 
-// Render Reviews to DOM
 function renderReviews() {
     const container = document.getElementById("reviewsContainer");
     if (!container) return;
@@ -72,7 +69,7 @@ function renderReviews() {
         const user = JSON.parse(localStorage.getItem("loggedInUser"));
         if (user && user.role === "admin") {
             const deleteBtn = document.createElement("button");
-            deleteBtn.classList.add("delete-btn");
+            deleteBtn.classList.add("delete-btn-review");
             deleteBtn.textContent = "🗑️ Delete";
             deleteBtn.onclick = () => {
                 reviews.splice(index, 1);
@@ -87,7 +84,6 @@ function renderReviews() {
     });
 }
 
-// Navigate to Previous Image
 function prevImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -98,7 +94,6 @@ function prevImage(gallery) {
     images[currentIndex].classList.add("active");
 }
 
-// Navigate to Next Image
 function nextImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -109,7 +104,6 @@ function nextImage(gallery) {
     images[currentIndex].classList.add("active");
 }
 
-// Convert Image to Base64
 function toBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -119,7 +113,6 @@ function toBase64(file) {
     });
 }
 
-// Add a New Review
 window.addReview = async function () {
     const name = document.getElementById("reviewerName").value;
     const title = document.getElementById("reviewTitle").value;
@@ -140,7 +133,6 @@ window.addReview = async function () {
     localStorage.setItem("reviews", JSON.stringify(reviews));
     renderReviews();
 
-    // Reset Inputs
     document.getElementById('reviewerName').value = '';
     document.getElementById('reviewTitle').value = '';
     document.getElementById('reviewContent').value = '';
@@ -148,10 +140,8 @@ window.addReview = async function () {
     document.getElementById('reviewImages').value = '';
 }
 
-// Ensure reviews render after SPApp has loaded the section
 $(document).on("spapp:ready", function () {
     if (window.location.hash === "#reviews") {
         initReviews();
     }
 });
-xamp

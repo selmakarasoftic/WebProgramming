@@ -1,4 +1,3 @@
-// Load cars from localStorage or use default array
 const defaultCars = [
     {
         model: "Audi RS7",
@@ -14,19 +13,19 @@ const defaultCars = [
     }
 ];
 
-const cars = JSON.parse(localStorage.getItem("cars")) || defaultCars;
+let cars = JSON.parse(localStorage.getItem("cars")) || defaultCars;
 
-// Initialize Cars Page
 function initCars() {
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const form = document.querySelector(".add-car");
+    
     if (user && user.role !== "admin") {
-        const form = document.getElementById("addCarForm");
         if (form) form.style.display = "none";
     }
+    
     renderCars();
 }
 
-// Render Cars to DOM
 function renderCars() {
     const container = document.getElementById("carsContainer");
     if (!container) return;
@@ -71,7 +70,7 @@ function renderCars() {
         const user = JSON.parse(localStorage.getItem("loggedInUser"));
         if (user && user.role === "admin") {
             const deleteBtn = document.createElement("button");
-            deleteBtn.classList.add("delete-btn");
+            deleteBtn.classList.add("delete-btn-cars");
             deleteBtn.textContent = "🗑️ Delete";
             deleteBtn.onclick = () => {
                 cars.splice(index, 1);
@@ -86,7 +85,45 @@ function renderCars() {
     });
 }
 
-// Navigate to previous image
+async function addNewCar() {
+    const model = document.getElementById("carModel").value;
+    const year = document.getElementById("carYear").value;
+    const engine = document.getElementById("engine").value;
+    const horsepower = document.getElementById("horsepower").value;
+    const imageInput = document.getElementById("carImages");
+
+    if (!model || !year || !engine || !horsepower || imageInput.files.length === 0) {
+        alert("Please fill all fields and add at least one image!");
+        return;
+    }
+
+    const images = await Promise.all(
+        Array.from(imageInput.files).map(file => toBase64(file))
+    );
+
+    const newCar = { model, year, engine, horsepower, images };
+
+    cars.push(newCar);
+    localStorage.setItem("cars", JSON.stringify(cars));
+
+    renderCars();
+
+    document.getElementById("carModel").value = "";
+    document.getElementById("carYear").value = "";
+    document.getElementById("engine").value = "";
+    document.getElementById("horsepower").value = "";
+    document.getElementById("carImages").value = "";
+}
+
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
 function prevImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -97,7 +134,6 @@ function prevImage(gallery) {
     images[currentIndex].classList.add("active");
 }
 
-// Navigate to next image
 function nextImage(gallery) {
     const images = gallery.querySelectorAll("img");
     const activeImage = gallery.querySelector("img.active");
@@ -108,10 +144,8 @@ function nextImage(gallery) {
     images[currentIndex].classList.add("active");
 }
 
-// Ensure render after SPApp has loaded the section
 $(document).on("spapp:ready", function () {
     if (window.location.hash === "#cars") {
         initCars();
     }
 });
-

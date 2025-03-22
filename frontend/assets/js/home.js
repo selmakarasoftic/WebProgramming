@@ -4,15 +4,18 @@ function initHome() {
     const adminInfo = document.getElementById("adminInfo");
     const highlightsContainer = document.getElementById("latestHighlights");
 
+    if (!welcomeMessage || !adminInfo || !highlightsContainer) return;
+
     if (user && user.role === "admin") {
-        welcomeMessage.innerHTML = `Welcome back, Admin ${user.username}! `;
+        welcomeMessage.innerHTML = `👋 Welcome back, <strong>Admin ${user.username}</strong>!`;
         adminInfo.style.display = "block";
     } else {
-        welcomeMessage.innerHTML = `Welcome, ${user ? user.username : "Guest"}! `;
+        welcomeMessage.innerHTML = `👋 Welcome, <strong>${user ? user.username : "Guest"}</strong>!`;
         adminInfo.style.display = "none";
     }
 
     renderHighlights();
+    setupAdminButtons();
 }
 
 function renderHighlights() {
@@ -27,30 +30,30 @@ function renderHighlights() {
 
     let highlights = [];
 
-    // Fetch latest cars
     if (cars.length > 0) {
+        const latestCar = cars[cars.length - 1];
         highlights.push({
             type: "car",
-            title: cars[cars.length - 1].model,
-            description: `Latest car added: ${cars[cars.length - 1].model}, ${cars[cars.length - 1].year}`,
+            title: `🚗 ${latestCar.model}`,
+            description: `Latest car added: <strong>${latestCar.model}</strong> (${latestCar.year})`
         });
     }
 
-    // Fetch latest reviews
     if (reviews.length > 0) {
+        const latestReview = reviews[reviews.length - 1];
         highlights.push({
             type: "review",
-            title: reviews[reviews.length - 1].title,
-            description: `${reviews[reviews.length - 1].name} says: "${reviews[reviews.length - 1].content}"`,
+            title: `⭐ ${latestReview.title}`,
+            description: `<strong>${latestReview.name}</strong> says: "${latestReview.content}"`
         });
     }
 
-    // Fetch latest meetups
     if (meetups.length > 0) {
+        const latestMeetup = meetups[meetups.length - 1];
         highlights.push({
             type: "meetup",
-            title: meetups[meetups.length - 1].title,
-            description: `Upcoming Meetup: ${meetups[meetups.length - 1].title} at ${meetups[meetups.length - 1].location}`,
+            title: `📅 ${latestMeetup.title}`,
+            description: `Next Meetup: <strong>${latestMeetup.title}</strong> at ${latestMeetup.location} on ${latestMeetup.date}`
         });
     }
 
@@ -70,7 +73,16 @@ function renderHighlights() {
     });
 }
 
-// Ensure render after SPApp has loaded the section
+function setupAdminButtons() {
+    document.querySelectorAll(".admin-actions button").forEach(button => {
+        button.addEventListener("click", function () {
+            const targetPage = button.getAttribute("data-page");
+            if (targetPage) {
+                window.location.hash = `#${targetPage}`;
+            }
+        });
+    });
+}
 $(document).on("spapp:ready", function () {
     if (window.location.hash === "#home") {
         initHome();
