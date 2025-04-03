@@ -1,156 +1,201 @@
 <?php
+require_once 'config.php';
+require_once 'BaseDao.php';
 require_once 'UserDao.php';
 require_once 'CarDao.php';
 require_once 'ReviewDao.php';
 require_once 'MeetupDao.php';
 require_once 'GalleryDao.php';
 
+echo "<pre>";
+
+$userDao = new UserDao();
 $carDao = new CarDao();
 $reviewDao = new ReviewDao();
 $meetupDao = new MeetupDao();
 $galleryDao = new GalleryDao();
-$userDao = new UserDao();
 
-// da provjeri jel ima kad testiram i to 
-function safeInsertUser($userDao, $data) {
-    $existing = $userDao->getByEmail($data['email']);
-    if (!$existing) {
-        $userDao->insert($data);
-        return end($userDao->getAll())['id'];
-    } else {
-        return $existing['id'];
+//kreiranje ili provjera usera
+echo "************* Checking/Creating Test User\n";
+$user = $userDao->getUserByEmail("testuser@example.com");
+
+if (!$user) {
+    $testUser = [
+        "username" => "testuser",
+        "email" => "testuser@example.com",
+        "password" => password_hash("123456", PASSWORD_DEFAULT)
+    ];
+    $userDao->registerUser($testUser);
+    $user = $userDao->getUserByEmail("testuser@example.com");
+    echo "Test user created.\n";
+} else {
+    echo "Test user already exists. Skipping insert.\n";
+}
+
+$user_id = $user["id"];
+print_r($user);
+
+// dodaj usera
+echo "\n************* Inserting Car \n";
+$car = [
+    "user_id" => $user_id,
+    "model" => "TestCar 3000",
+    "year" => 2025,
+    "engine" => "Turbo-Electric",
+    "horsepower" => 500,
+    "image_url" => "assets/images/car.jpg"
+];
+$carDao->addCar($car);
+$cars = $carDao->getCarsByUser($user_id);
+$car_id = $cars[0]["id"];
+print_r($cars);
+
+// dodaj review
+echo "\n************* Inserting Review \n";
+$review = [
+    "user_id" => $user_id,
+    "car_id" => $car_id,
+    "title" => "Awesome Ride",
+    "review_text" => "Very smooth and futuristic.",
+    "rating" => 5
+];
+$reviewDao->addReview($review);
+$reviews = $reviewDao->getReviewsByUser($user_id);
+$review_id = $reviews[0]["id"];
+print_r($reviews);
+
+// dodaj meetup
+echo "\n*************Inserting Meetup \n";
+$meetup = [
+    "title" => "Test Meetup",
+    "date" => "2025-06-10",
+    "location" => "Test City",
+    "description" => "For testing purposes.",
+    "organizer_id" => $user_id
+];
+$meetupDao->addMeetup($meetup);
+$meetups = $meetupDao->getMeetupsByOrganizer($user_id);
+$meetup_id = $meetups[0]["id"];
+print_r($meetups);
+
+// dodaj sliku u galeriju 
+echo "\n************* Inserting Gallery Item \n";
+$gallery = [
+    "user_id" => $user_id,
+    "title" => "Test Pic",
+    "image_url" => "assets/images/photo.jpg"
+];
+$galleryDao->addGalleryItem($gallery);
+$galleryItems = $galleryDao->getGalleryItemsByUser($user_id);
+$gallery_id = $galleryItems[0]["id"];
+print_r($galleryItems);
+
+// updateanje svega provjera
+echo "\n*************Updating Records \n";
+$newUsername = "updateduser";
+$newEmail = "updated@example.com";
+
+$existingUsers = $userDao->getAllUsers();
+$usernameTaken = false;
+$emailTaken = false;
+foreach ($existingUsers as $u) {
+    if ($u['id'] != $user_id) {
+        if ($u['username'] === $newUsername) $usernameTaken = true;
+        if ($u['email'] === $newEmail) $emailTaken = true;
     }
 }
 
-function safeInsertCar($carDao, $data) {
-    $all = $carDao->getAll();
-    foreach ($all as $car) {
-        if ($car['model'] === $data['model'] && $car['year'] == $data['year'] && $car['user_id'] == $data['user_id']) {
-            return $car['id'];
-        }
-    }
-    $carDao->insert($data);
-    return end($carDao->getAll())['id'];
+if ($usernameTaken || $emailTaken) {
+    echo " Username or email already taken. Skipping updateUser()\n";
+} else {
+    $userDao->updateUser($user_id, ["username" => $newUsername, "email" => $newEmail]);
+    echo "User updated successfully.\n";
 }
 
-function safeInsertReview($reviewDao, $data) {
-    $all = $reviewDao->getAll();
-    foreach ($all as $rev) {
-        if ($rev['user_id'] == $data['user_id'] && $rev['car_id'] == $data['car_id']) {
-            return $rev['id'];
-        }
-    }
-    $reviewDao->insert($data);
-    return end($reviewDao->getAll())['id'];
+$carDao->updateCar($car_id, [
+    "model" => "Updated Model",
+    "year" => 2030,
+    "engine" => "Electric Pro",
+    "horsepower" => 999,
+    "image_url" => "updated.jpg"
+]);
+
+$reviewDao->updateReview($review_id, [
+    "title" => "Updated Review",
+    "review_text" => "Actually not that smooth...",
+    "rating" => 3
+]);
+
+$meetupDao->updateMeetup($meetup_id, [
+    "title" => "Updated Meetup",
+    "date" => "2025-07-01",
+    "location" => "New City",
+    "description" => "Updated description."
+]);
+
+echo "Updated User:\n";
+print_r($userDao->getUserById($user_id));
+echo "Updated Car:\n";
+print_r($carDao->getCarById($car_id));
+echo "Updated Review:\n";
+print_r($reviewDao->getReviewById($review_id));
+echo "Updated Meetup:\n";
+print_r($meetupDao->getMeetupById($meetup_id));
+
+// get by id provjera
+echo "\n*************getById Tests \n";
+print_r($userDao->getUserById($user_id));
+print_r($carDao->getCarById($car_id));
+print_r($reviewDao->getReviewById($review_id));
+print_r($meetupDao->getMeetupById($meetup_id));
+print_r($galleryDao->getGalleryItemById($gallery_id));
+
+// promjena pasworda
+echo "\n************* Changing Password \n";
+$newPassword = password_hash("newpassword123", PASSWORD_DEFAULT);
+$userDao->changePassword($user_id, $newPassword);
+echo "Password changed for user ID: $user_id\n";
+
+// daj sve usere
+echo "\n*************All Users \n";
+print_r($userDao->getAllUsers());
+
+// cound provjera
+echo "\n*************Profile Stats for User ID: $user_id \n";
+echo "Total Cars: " . $carDao->countCarsByUser($user_id) . "\n";
+echo "Total Reviews: " . $reviewDao->countReviewsByUser($user_id) . "\n";
+echo "Total Meetups: " . $meetupDao->countMeetupsByUser($user_id) . "\n";
+
+// provjera brisanja
+echo "\n*************Deleting Everything \n";
+
+// brisanje po useru 
+$reviews = $reviewDao->getReviewsByUser($user_id);
+foreach ($reviews as $r) {
+    $reviewDao->deleteReview($r['id']);
 }
 
-function safeInsertMeetup($meetupDao, $data) {
-    $all = $meetupDao->getAll();
-    foreach ($all as $meetup) {
-        if ($meetup['title'] === $data['title'] && $meetup['date'] === $data['date']) {
-            return $meetup['id'];
-        }
-    }
-    $meetupDao->insert($data);
-    return end($meetupDao->getAll())['id'];
+$cars = $carDao->getCarsByUser($user_id);
+foreach ($cars as $c) {
+    $carDao->deleteCar($c['id']);
 }
 
-function safeInsertGallery($galleryDao, $data) {
-    $all = $galleryDao->getAll();
-    foreach ($all as $img) {
-        if ($img['user_id'] == $data['user_id'] && $img['title'] === $data['title']) {
-            return $img['id'];
-        }
-    }
-    $galleryDao->insert($data);
-    return end($galleryDao->getAll())['id'];
+$meetups = $meetupDao->getMeetupsByOrganizer($user_id);
+foreach ($meetups as $m) {
+    $meetupDao->deleteMeetup($m['id']);
 }
 
-// za usere 
-$userId = safeInsertUser($userDao, [
-    'username' => 'selma_test',
-    'email' => 'selma_test@example.com',
-    'password' => password_hash('test123', PASSWORD_DEFAULT),
-    'role' => 'guest'
-]);
-echo "<h3>All Users:</h3><pre>";
-print_r($userDao->getAll());
-echo "</pre>";
+$galleryItems = $galleryDao->getGalleryItemsByUser($user_id);
+foreach ($galleryItems as $g) {
+    $galleryDao->deleteGalleryItem($g['id']);
+}
 
-$userDao->update($userId, ['username' => 'updated_selma']);
-echo "<h3>User After Update:</h3><pre>";
-print_r($userDao->getById($userId));
-echo "</pre>";
-// $userDao->delete($userId); // Uncomment to test delete
+//brisanje usera
+$userDao->deleteUser($user_id);
 
-// za auta
-$carId = safeInsertCar($carDao, [
-    'user_id' => $userId,
-    'model' => 'Audi A4',
-    'year' => 2022,
-    'engine' => '2.0 TFSI',
-    'horsepower' => 190,
-    'image_url' => 'https://example.com/audi.jpg'
-]);
-echo "<h3>All Cars:</h3><pre>";
-print_r($carDao->getAll());
-echo "</pre>";
+// prikazi useera obrisanog( ako prikaze ne valja)
+echo "Deleted User: ";
+print_r($userDao->getUserById($user_id));
 
-$carDao->update($carId, ['model' => 'Audi A4 S-line']);
-echo "<h3>Car After Update:</h3><pre>";
-print_r($carDao->getById($carId));
 echo "</pre>";
-// $carDao->delete($carId);
-
-// za reviews
-$reviewId = safeInsertReview($reviewDao, [
-    'user_id' => $userId,
-    'car_id' => $carId,
-    'title' => 'Solid Car!',
-    'review_text' => 'Very comfortable and smooth ride.',
-    'rating' => 5
-]);
-echo "<h3>All Reviews:</h3><pre>";
-print_r($reviewDao->getAll());
-echo "</pre>";
-
-$reviewDao->update($reviewId, ['title' => 'Updated Review']);
-echo "<h3>Review After Update:</h3><pre>";
-print_r($reviewDao->getById($reviewId));
-echo "</pre>";
-// $reviewDao->delete($reviewId);
-
-// za meetups
-$meetupId = safeInsertMeetup($meetupDao, [
-    'title' => 'AutoVerse Sarajevo Meetup',
-    'date' => '2025-04-10',
-    'location' => 'Sarajevo City Center',
-    'organizer_id' => $userId,
-    'description' => 'Join us for a gathering of car enthusiasts!'
-]);
-echo "<h3>All Meetups:</h3><pre>";
-print_r($meetupDao->getAll());
-echo "</pre>";
-
-$meetupDao->update($meetupId, ['location' => 'Skenderija Hall']);
-echo "<h3>Meetup After Update:</h3><pre>";
-print_r($meetupDao->getById($meetupId));
-echo "</pre>";
-// $meetupDao->delete($meetupId);
-
-// za galeriju 
-$galleryId = safeInsertGallery($galleryDao, [
-    'user_id' => $userId,
-    'title' => 'My Audi A4',
-    'image_url' => 'https://example.com/gallery/audi.jpg'
-]);
-echo "<h3>All Gallery Items:</h3><pre>";
-print_r($galleryDao->getAll());
-echo "</pre>";
-
-$galleryDao->update($galleryId, ['title' => 'Updated Audi Gallery']);
-echo "<h3>Gallery After Update:</h3><pre>";
-print_r($galleryDao->getAll());
-echo "</pre>"; 
-//$galleryDao->delete($galleryId);
 ?>
