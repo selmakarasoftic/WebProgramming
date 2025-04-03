@@ -42,7 +42,7 @@ class GalleryDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // ✅ Upload new photo to gallery
+    // dodaj
     public function addGalleryItem($data) {
         $stmt = $this->connection->prepare("
             INSERT INTO gallery (user_id, title, image_url)
@@ -51,14 +51,16 @@ class GalleryDao extends BaseDao {
         return $stmt->execute($data);
     }
 
-    // ✅ Delete photo from gallery
+    // obrisi
     public function deleteGalleryItem($id) {
         $stmt = $this->connection->prepare("DELETE FROM gallery WHERE id = :id");
         $stmt->bindParam(":id", $id);
         return $stmt->execute();
     }
-
-    // 🔍 Optional: Get all items uploaded by a specific user
+    
+    // ovo vidjeti da mozda user moze da vidi
+    // samo svoja dodana ako hoce al to moram na frontu dpdat
+    //isto kao za auta mozda samo button dodati neki 
     public function getGalleryItemsByUser($user_id) {
         $stmt = $this->connection->prepare("
             SELECT * FROM gallery WHERE user_id = :user_id ORDER BY uploaded_at DESC
