@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+/*require_once 'config.php';
 require_once 'BaseDao.php';
 require_once 'UserDao.php';
 require_once 'CarDao.php';
@@ -197,5 +197,5 @@ $userDao->deleteUser($user_id);
 echo "Deleted User: ";
 print_r($userDao->getUserById($user_id));
 
-echo "</pre>";
+echo "</pre>";*/
 ?>
