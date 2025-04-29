@@ -1,107 +1,107 @@
 <?php
-require_once 'services/UserService.php';
-require_once 'services/CarService.php';
-require_once 'services/ReviewService.php';
-require_once 'services/MeetupService.php';
-require_once 'services/GalleryService.php';
 
-echo "<pre>";
+require_once 'CarService.php';
+require_once 'ReviewService.php';
+require_once 'UserService.php';
+require_once 'GalleryService.php';
+require_once 'MeetupService.php';
 
-$userService = new UserService();
-$carService = new CarService();
-$reviewService = new ReviewService();
-$meetupService = new MeetupService();
-$galleryService = new GalleryService();
+$car_service = new CarService();
+$review_service = new ReviewService();
+$user_service = new UserService();
+$gallery_service = new GalleryService();
+$meetup_service = new MeetupService();
 
-echo "---------------- Creating Test User ----------------\n";
-$user = $userService->getUserByEmail("serviceuser@example.com");
+try {
+    echo "<h2>Testing CarService</h2>";
 
-if (!$user) {
-    $userService->create([
-        "username" => "serviceuser",
-        "email" => "serviceuser@example.com",
-        "password" => password_hash("123456", PASSWORD_DEFAULT)
-    ]);
-    $user = $userService->getUserByEmail("serviceuser@example.com");
+    // Test create car
+    $new_car = [
+        "user_id" => 12,
+        "model" => "Honda Civic",
+        "year" => 2019,
+        "engine" => "2.0L VTEC",
+        "horsepower" => 158,
+        "image_url" => "https://example.com/honda.jpg"
+    ];
+    $car_service->createCar($new_car);
+
+    // Test get all cars
+    $cars = $car_service->getAllCars();
+    echo "<pre>";
+    print_r($cars);
+    echo "</pre>";
+
+    echo "<h2>Testing ReviewService</h2>";
+
+    // Test create review
+    $new_review = [
+        "user_id" => 12,
+        "car_id" => 1,
+        "title" => "Great ride!",
+        "review_text" => "The car drives smoothly and looks amazing.",
+        "rating" => 5
+    ];
+    $review_service->createReview($new_review);
+
+    // Test get all reviews
+    $reviews = $review_service->getAllReviews();
+    echo "<pre>";
+    print_r($reviews);
+    echo "</pre>";
+
+    echo "<h2>Testing UserService</h2>";
+
+    // Test register new user
+    $new_user = [
+        "username" => "testuser1234",
+        "email" => "testuser1234@example.com",
+        "password" => "securepassword"
+    ];
+    $user_service->registerUser($new_user);
+
+    // Test get all users
+    $users = $user_service->getAllUsers();
+    echo "<pre>";
+    print_r($users);
+    echo "</pre>";
+
+    echo "<h2>Testing GalleryService</h2>";
+
+    // Test create gallery item
+    $new_gallery_item = [
+        "user_id" => 12,
+        "title" => "Cool Car Pic",
+        "image_url" => "https://example.com/carphoto.jpg"
+    ];
+    $gallery_service->createGalleryItem($new_gallery_item);
+
+    // Test get all gallery items
+    $gallery_items = $gallery_service->getAllGalleryItems();
+    echo "<pre>";
+    print_r($gallery_items);
+    echo "</pre>";
+
+    echo "<h2>Testing MeetupService</h2>";
+
+    // Test create meetup
+    $new_meetup = [
+        "title" => "Car Lovers Gathering",
+        "date" => "2025-06-15",
+        "location" => "City Park",
+        "description" => "Meet other car enthusiasts and show off your rides.",
+        "organizer_id" => 12
+    ];
+    $meetup_service->createMeetup($new_meetup);
+
+    // Test get all meetups
+    $meetups = $meetup_service->getAllMeetups();
+    echo "<pre>";
+    print_r($meetups);
+    echo "</pre>";
+
+} catch (Exception $e) {
+    echo "<strong>Error: </strong>" . $e->getMessage();
 }
-$user_id = $user["id"];
-print_r($user);
 
-echo "\n---------------- Adding Car ----------------\n";
-$carService->create([
-    "user_id" => $user_id,
-    "model" => "ServiceCar",
-    "year" => 2024,
-    "engine" => "Hybrid",
-    "horsepower" => 450,
-    "image_url" => "assets/car.jpg"
-]);
-$cars = $carService->getCarsByUser($user_id);
-$car_id = $cars[0]["id"];
-print_r($cars);
-
-echo "\n---------------- Adding Review ----------------\n";
-$reviewService->create([
-    "user_id" => $user_id,
-    "car_id" => $car_id,
-    "title" => "Service Review",
-    "review_text" => "This is great.",
-    "rating" => 5
-]);
-$reviews = $reviewService->getReviewsByUser($user_id);
-$review_id = $reviews[0]["id"];
-print_r($reviews);
-
-echo "\n---------------- Adding Meetup ----------------\n";
-$meetupService->create([
-    "title" => "Service Meetup",
-    "date" => "2025-06-01",
-    "location" => "Online",
-    "description" => "Meet and test",
-    "organizer_id" => $user_id
-]);
-$meetups = $meetupService->getMeetupsByOrganizer($user_id);
-$meetup_id = $meetups[0]["id"];
-print_r($meetups);
-
-echo "\n---------------- Adding Gallery ----------------\n";
-$galleryService->create([
-    "user_id" => $user_id,
-    "title" => "Service Photo",
-    "image_url" => "assets/gallery.jpg"
-]);
-$galleryItems = $galleryService->getGalleryItemsByUser($user_id);
-$gallery_id = $galleryItems[0]["id"];
-print_r($galleryItems);
-
-echo "\n---------------- Stats ----------------\n";
-echo "Cars: " . $carService->countCarsByUser($user_id) . "\n";
-echo "Reviews: " . $reviewService->countReviewsByUser($user_id) . "\n";
-echo "Meetups: " . $meetupService->countMeetupsByUser($user_id) . "\n";
-/*
-// OVDJE JE BRISANJE KOMENTARISANO 
-echo "\n---------------- Deleting All Test Records ----------------\n";
-
-foreach ($reviewService->getReviewsByUser($user_id) as $r) {
-    $reviewService->delete($r['id']);
-}
-
-foreach ($carService->getCarsByUser($user_id) as $c) {
-    $carService->delete($c['id']);
-}
-
-foreach ($meetupService->getMeetupsByOrganizer($user_id) as $m) {
-    $meetupService->delete($m['id']);
-}
-
-foreach ($galleryService->getGalleryItemsByUser($user_id) as $g) {
-    $galleryService->delete($g['id']);
-}
-
-$userService->delete($user_id);
-
-echo "Deleted user? ";
-print_r($userService->getById($user_id));
-*/
-echo "</pre>";
 ?>
