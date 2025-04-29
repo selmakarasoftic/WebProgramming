@@ -9,6 +9,8 @@ class ComposerStaticInit8d070178755c320c69f93ee4800660ef
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        '4cdafd4a5191caf078235e7dd119fdaf' => __DIR__ . '/..' . '/flightphp/core/flight/autoload.php',
+        'e3cd3e6ea0fe16cf6c6b16fa591c5162' => __DIR__ . '/..' . '/flightphp/core/flight/Flight.php',
         'fc73bab8d04e21bcdda37ca319c63800' => __DIR__ . '/..' . '/mikecao/flight/flight/autoload.php',
     );
 

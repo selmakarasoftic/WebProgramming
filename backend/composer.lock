@@ -4,8 +4,56 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "962a5cc5847c796b88d4982a410753b0",
+    "content-hash": "90740970a660c414380fce55d80cf5d4",
     "packages": [
+        {
+            "name": "flightphp/core",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/flightphp/core.git",
+                "reference": "a130231646e6c7a9e2504a9025f851e9a3bf1975"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/flightphp/core/zipball/a130231646e6c7a9e2504a9025f851e9a3bf1975",
+                "reference": "a130231646e6c7a9e2504a9025f851e9a3bf1975",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.4|^8.0|^8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "flight/autoload.php",
+                    "flight/Flight.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike Cao",
+                    "email": "mike@mikecao.com",
+                    "homepage": "http://www.mikecao.com/",
+                    "role": "Original Developer"
+                }
+            ],
+            "description": "Flight is a fast, simple, extensible framework for PHP. Flight enables you to quickly and easily build RESTful web applications.",
+            "homepage": "http://flightphp.com",
+            "support": {
+                "issues": "https://github.com/flightphp/core/issues",
+                "source": "https://github.com/flightphp/core/tree/v2.0.1"
+            },
+            "time": "2021-12-19T03:03:01+00:00"
+        },
         {
             "name": "mikecao/flight",
             "version": "v3.15.2",

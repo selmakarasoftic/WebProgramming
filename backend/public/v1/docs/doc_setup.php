@@ -3,8 +3,8 @@
 /**
  * @OA\Info(
  *     title="AutoVerse API",
- *     version="1.0",
- *     description="API documentation for AutoVerse project",
+ *     description="API documentation for the AutoVerse project",
+ *     version="1.0.0",
  *     @OA\Contact(
  *         email="selma.karasoftic@stu.ibu.edu.ba",
  *         name="Selma"
@@ -12,7 +12,7 @@
  * )
  *
  * @OA\Server(
- *     url="http://localhost:8000",
+ *     url="http://localhost/SelmaKarasoftic/WebProgramming/backend",
  *     description="Local server"
  * )
  */
