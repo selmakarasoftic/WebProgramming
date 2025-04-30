@@ -64,7 +64,7 @@ class CarDao extends BaseDao {
             WHERE id = :id
         ");
         $stmt->execute($data);
-        return $stmt->rowCount(); // ✅ returns number of rows affected
+        return $stmt->rowCount(); // returns number of rows affected
     }
 
     // Delete car
@@ -72,7 +72,7 @@ class CarDao extends BaseDao {
         $stmt = $this->connection->prepare("DELETE FROM cars WHERE id = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        return $stmt->rowCount(); // ✅ returns number of rows affected
+        return $stmt->rowCount(); // returns number of rows affected
     }
 
     // Get all cars by user
