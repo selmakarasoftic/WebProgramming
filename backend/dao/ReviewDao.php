@@ -69,14 +69,16 @@ class ReviewDao extends BaseDao {
                 rating = :rating
             WHERE id = :id
         ");
-        return $stmt->execute($data);
+        $stmt->execute($data);
+        return $stmt->rowCount(); // ✅ broj izmijenjenih redova
     }
 
     // delete
     public function deleteReview($id) {
         $stmt = $this->connection->prepare("DELETE FROM reviews WHERE id = :id");
         $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $stmt->execute();
+        return $stmt->rowCount(); // ✅ broj obrisanih redova
     }
 
     // isto kao i ostalo
@@ -88,7 +90,8 @@ class ReviewDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    //isto zbog profila 
+
+    // isto zbog profila 
     public function countReviewsByUser($user_id) {
         $stmt = $this->connection->prepare("
             SELECT COUNT(*) as total FROM reviews WHERE user_id = :user_id
@@ -97,6 +100,5 @@ class ReviewDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    
 }
 ?>

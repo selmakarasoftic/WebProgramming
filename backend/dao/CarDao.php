@@ -6,7 +6,7 @@ class CarDao extends BaseDao {
         parent::__construct("cars");
     }
 
-    //list all cars 
+    // Get all cars
     public function getAllCars() {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -25,8 +25,7 @@ class CarDao extends BaseDao {
         return $stmt->fetchAll();
     }
 
-//get car by id moram vidjei mogu li ghde ubaciti u projekt 
-
+    // Get car by ID
     public function getCarById($id) {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -47,7 +46,7 @@ class CarDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // novo auto
+    // Add new car
     public function addCar($data) {
         $stmt = $this->connection->prepare("
             INSERT INTO cars (user_id, model, year, engine, horsepower, image_url)
@@ -56,7 +55,7 @@ class CarDao extends BaseDao {
         return $stmt->execute($data);
     }
 
-    // update
+    // Update car
     public function updateCar($id, $data) {
         $data['id'] = $id;
         $stmt = $this->connection->prepare("
@@ -64,17 +63,19 @@ class CarDao extends BaseDao {
             SET model = :model, year = :year, engine = :engine, horsepower = :horsepower, image_url = :image_url
             WHERE id = :id
         ");
-        return $stmt->execute($data);
+        $stmt->execute($data);
+        return $stmt->rowCount(); // ✅ returns number of rows affected
     }
 
-    // delete
+    // Delete car
     public function deleteCar($id) {
         $stmt = $this->connection->prepare("DELETE FROM cars WHERE id = :id");
         $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+        $stmt->execute();
+        return $stmt->rowCount(); // ✅ returns number of rows affected
     }
 
-    // 🔍 Optional: Get all cars by a specific user (used in profile/dashboard)
+    // Get all cars by user
     public function getCarsByUser($user_id) {
         $stmt = $this->connection->prepare("SELECT * FROM cars WHERE user_id = :user_id");
         $stmt->bindParam(':user_id', $user_id);
@@ -82,17 +83,12 @@ class CarDao extends BaseDao {
         return $stmt->fetchAll();
     }
 
-    // ovo vidjeti da mozda user moze da vidi
-    // samo svoja dodana ako hoce al to moram na frontu dpdat
+    // Count user cars
     public function countCarsByUser($user_id) {
-        $stmt = $this->connection->prepare("
-            SELECT COUNT(*) as total FROM cars WHERE user_id = :user_id
-        ");
+        $stmt = $this->connection->prepare("SELECT COUNT(*) as total FROM cars WHERE user_id = :user_id");
         $stmt->bindParam(":user_id", $user_id);
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    
 }
-
 ?>

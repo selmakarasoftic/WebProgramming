@@ -39,7 +39,8 @@ class UserDao extends BaseDao {
             SET username = :username, email = :email
             WHERE id = :id
         ");
-        return $stmt->execute($data);
+        $stmt->execute($data);
+        return $stmt->rowCount(); // ✅ return number of affected rows
     }
 
     // change pwd
@@ -65,7 +66,8 @@ class UserDao extends BaseDao {
     public function deleteUser($id) {
         $stmt = $this->connection->prepare("DELETE FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id);
-        return $stmt->execute();
+        $stmt->execute();
+        return $stmt->rowCount(); // ✅ return number of affected rows
     }
 }
 ?>

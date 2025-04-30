@@ -1,25 +1,127 @@
 <?php
 
-Flight::route('GET /meetups', function() {
+/**
+ * @OA\Get(
+ *     path="/meetups",
+ *     summary="Get all meetups",
+ *     tags={"Meetups"},
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of meetups"
+ *     )
+ * )
+ */
+Flight::route('GET /meetups', function () {
     Flight::json(Flight::meetupService()->getAllMeetups());
 });
 
-Flight::route('GET /meetups/@id', function($id) {
+/**
+ * @OA\Get(
+ *     path="/meetups/{id}",
+ *     summary="Get a meetup by ID",
+ *     tags={"Meetups"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the meetup",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Meetup found"
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Meetup not found"
+ *     )
+ * )
+ */
+Flight::route('GET /meetups/@id', function ($id) {
     Flight::json(Flight::meetupService()->getMeetupById($id));
 });
 
-Flight::route('POST /meetups', function() {
+/**
+ * @OA\Post(
+ *     path="/meetups",
+ *     summary="Create a new meetup",
+ *     tags={"Meetups"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"title", "date", "location", "description", "organizer_id"},
+ *             @OA\Property(property="title", type="string"),
+ *             @OA\Property(property="date", type="string", format="date"),
+ *             @OA\Property(property="location", type="string"),
+ *             @OA\Property(property="description", type="string"),
+ *             @OA\Property(property="organizer_id", type="integer")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Meetup created"
+ *     )
+ * )
+ */
+Flight::route('POST /meetups', function () {
     $data = Flight::request()->data->getData();
     Flight::json(Flight::meetupService()->createMeetup($data));
 });
 
-Flight::route('PUT /meetups/@id', function($id) {
+/**
+ * @OA\Put(
+ *     path="/meetups/{id}",
+ *     summary="Update a meetup",
+ *     tags={"Meetups"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Meetup ID",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="title", type="string"),
+ *             @OA\Property(property="date", type="string", format="date"),
+ *             @OA\Property(property="location", type="string"),
+ *             @OA\Property(property="description", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Meetup updated"
+ *     )
+ * )
+ */
+Flight::route('PUT /meetups/@id', function ($id) {
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::meetupService()->updateMeetup($id, $data));
+    $success = Flight::meetupService()->updateMeetup($id, $data);
+    Flight::json(["message" => $success ? "Meetup updated" : "Update failed"]);
 });
 
-Flight::route('DELETE /meetups/@id', function($id) {
-    Flight::json(Flight::meetupService()->deleteMeetup($id));
+/**
+ * @OA\Delete(
+ *     path="/meetups/{id}",
+ *     summary="Delete a meetup",
+ *     tags={"Meetups"},
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Meetup ID",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Meetup deleted"
+ *     )
+ * )
+ */
+Flight::route('DELETE /meetups/@id', function ($id) {
+    $success = Flight::meetupService()->deleteMeetup($id);
+    Flight::json(["message" => $success ? "Meetup deleted" : "Delete failed"]);
 });
 
 ?>

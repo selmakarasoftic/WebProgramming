@@ -12,7 +12,7 @@
  * )
  *
  * @OA\Server(
- *     url="http://localhost/SelmaKarasoftic/WebProgramming/backend",
+ *     url="http://localhost:8000",
  *     description="Local server"
  * )
  */
