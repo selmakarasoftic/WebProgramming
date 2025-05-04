@@ -1,19 +1,30 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 /**
  * @OA\Info(
- *     title="AutoVerse API",
- *     description="API documentation for the AutoVerse project",
- *     version="1.0.0",
+ *     title="API",
+ *     description="API for AutoVerse",
+ *     version="1.0",
  *     @OA\Contact(
  *         email="selma.karasoftic@stu.ibu.edu.ba",
- *         name="Selma"
+ *         name="Selma Karasoftic"
  *     )
  * )
- *
+ */
+
+/**
  * @OA\Server(
- *     url="http://localhost:8000",
- *     description="Local server"
+ *     url="http://localhost/SelmaKarasoftic/WebProgramming/backend",
+ *     description="API Server"
  * )
  */
-?>
+/**
+* @OA\SecurityScheme(
+*     securityScheme="ApiKey",
+*     type="apiKey",
+*     in="header",
+*     name="Authentication"
+* )
+*/

@@ -65,7 +65,11 @@ Flight::route('GET /meetups/@id', function ($id) {
  */
 Flight::route('POST /meetups', function () {
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::meetupService()->createMeetup($data));
+    $success = Flight::meetupService()->createMeetup($data);
+    Flight::json([
+        "success" => $success,
+        "message" => $success ? "Meetup created successfully" : "Failed to create meetup"
+    ]);
 });
 
 /**
@@ -97,8 +101,12 @@ Flight::route('POST /meetups', function () {
  */
 Flight::route('PUT /meetups/@id', function ($id) {
     $data = Flight::request()->data->getData();
-    $success = Flight::meetupService()->updateMeetup($id, $data);
-    Flight::json(["message" => $success ? "Meetup updated" : "Update failed"]);
+    $rows = Flight::meetupService()->updateMeetup($id, $data);
+    Flight::json([
+        "success" => $rows > 0,
+        "updated_id" => $id,
+        "message" => $rows > 0 ? "Meetup updated successfully" : "No meetup updated (check ID)"
+    ]);
 });
 
 /**
@@ -120,8 +128,10 @@ Flight::route('PUT /meetups/@id', function ($id) {
  * )
  */
 Flight::route('DELETE /meetups/@id', function ($id) {
-    $success = Flight::meetupService()->deleteMeetup($id);
-    Flight::json(["message" => $success ? "Meetup deleted" : "Delete failed"]);
+    $rows = Flight::meetupService()->deleteMeetup($id);
+    Flight::json([
+        "success" => $rows > 0,
+        "deleted_id" => $id,
+        "message" => $rows > 0 ? "Meetup deleted successfully" : "No meetup deleted (check ID)"
+    ]);
 });
-
-?>

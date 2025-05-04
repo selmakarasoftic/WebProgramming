@@ -11,7 +11,7 @@
  *     )
  * )
  */
-Flight::route('GET /cars', function() {
+Flight::route('GET /cars', function () {
     Flight::json(Flight::carService()->getAllCars());
 });
 
@@ -32,7 +32,7 @@ Flight::route('GET /cars', function() {
  *     )
  * )
  */
-Flight::route('GET /cars/@id', function($id) {
+Flight::route('GET /cars/@id', function ($id) {
     Flight::json(Flight::carService()->getCarById($id));
 });
 
@@ -56,7 +56,7 @@ Flight::route('GET /cars/@id', function($id) {
  *     @OA\Response(response=200, description="Car added")
  * )
  */
-Flight::route('POST /cars', function() {
+Flight::route('POST /cars', function () {
     $data = Flight::request()->data->getData();
     Flight::json([
         "success" => Flight::carService()->createCar($data),
@@ -88,7 +88,7 @@ Flight::route('POST /cars', function() {
  *     @OA\Response(response=200, description="Car updated")
  * )
  */
-Flight::route('PUT /cars/@id', function($id) {
+Flight::route('PUT /cars/@id', function ($id) {
     $data = Flight::request()->data->getData();
     $rows = Flight::carService()->updateCar($id, $data);
 
@@ -113,7 +113,7 @@ Flight::route('PUT /cars/@id', function($id) {
  *     @OA\Response(response=200, description="Car deleted")
  * )
  */
-Flight::route('DELETE /cars/@id', function($id) {
+Flight::route('DELETE /cars/@id', function ($id) {
     $rows = Flight::carService()->deleteCar($id);
 
     Flight::json([
@@ -122,4 +122,3 @@ Flight::route('DELETE /cars/@id', function($id) {
         "message" => $rows > 0 ? "Car deleted successfully" : "No car deleted (check ID)"
     ]);
 });
-?>

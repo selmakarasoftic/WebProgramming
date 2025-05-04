@@ -44,9 +44,11 @@ Flight::route('GET /users/@id', function ($id) {
  */
 Flight::route('POST /register', function () {
     $data = Flight::request()->data->getData();
+    $success = Flight::userService()->registerUser($data);
+
     Flight::json([
-        "success" => Flight::userService()->registerUser($data),
-        "message" => "User registered"
+        "success" => $success,
+        "message" => $success ? "User registered successfully" : "Registration failed"
     ]);
 });
 
@@ -68,7 +70,19 @@ Flight::route('POST /register', function () {
  */
 Flight::route('POST /login', function () {
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::userService()->getUserByEmail($data['email']));
+    try {
+        $user = Flight::userService()->loginUser($data['email'], $data['password']);
+        Flight::json([
+            "success" => true,
+            "user" => $user,
+            "message" => "Login successful"
+        ]);
+    } catch (Exception $e) {
+        Flight::json([
+            "success" => false,
+            "message" => $e->getMessage()
+        ], 401);
+    }
 });
 
 /**
@@ -93,7 +107,7 @@ Flight::route('PUT /users/@id', function ($id) {
 
     Flight::json([
         "success" => $rows > 0,
-        "message" => $rows > 0 ? "User updated" : "No user updated"
+        "message" => $rows > 0 ? "User updated successfully" : "No user updated"
     ]);
 });
 
@@ -111,8 +125,6 @@ Flight::route('DELETE /users/@id', function ($id) {
 
     Flight::json([
         "success" => $rows > 0,
-        "message" => $rows > 0 ? "User deleted" : "No user deleted"
+        "message" => $rows > 0 ? "User deleted successfully" : "No user deleted"
     ]);
 });
-
-?>

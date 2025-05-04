@@ -18,7 +18,8 @@ Flight::route('GET /reviews', function() {
  *     summary="Get a review by ID",
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
- *     @OA\Response(response=200, description="Review details")
+ *     @OA\Response(response=200, description="Review details"),
+ *     @OA\Response(response=404, description="Review not found")
  * )
  */
 Flight::route('GET /reviews/@id', function($id) {
@@ -46,9 +47,10 @@ Flight::route('GET /reviews/@id', function($id) {
  */
 Flight::route('POST /reviews', function() {
     $data = Flight::request()->data->getData();
+    $success = Flight::reviewService()->createReview($data);
     Flight::json([
-        "success" => Flight::reviewService()->createReview($data),
-        "message" => "Review added"
+        "success" => $success,
+        "message" => $success ? "Review created successfully" : "Failed to create review"
     ]);
 });
 
@@ -72,10 +74,10 @@ Flight::route('POST /reviews', function() {
 Flight::route('PUT /reviews/@id', function($id) {
     $data = Flight::request()->data->getData();
     $rows = Flight::reviewService()->updateReview($id, $data);
-
     Flight::json([
         "success" => $rows > 0,
-        "message" => $rows > 0 ? "Review updated" : "No review updated"
+        "updated_id" => $id,
+        "message" => $rows > 0 ? "Review updated successfully" : "No review updated (check ID)"
     ]);
 });
 
@@ -90,11 +92,10 @@ Flight::route('PUT /reviews/@id', function($id) {
  */
 Flight::route('DELETE /reviews/@id', function($id) {
     $rows = Flight::reviewService()->deleteReview($id);
-
     Flight::json([
         "success" => $rows > 0,
-        "message" => $rows > 0 ? "Review deleted" : "No review deleted"
+        "deleted_id" => $id,
+        "message" => $rows > 0 ? "Review deleted successfully" : "No review deleted (check ID)"
     ]);
 });
-
 ?>

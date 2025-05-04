@@ -1,6 +1,5 @@
 <?php
-
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 // Register services
 require_once __DIR__ . '/services/CarService.php';
@@ -23,5 +22,6 @@ require_once __DIR__ . '/routes/GalleryRoutes.php';
 require_once __DIR__ . '/routes/MeetupRoutes.php';
 
 Flight::start();
+
 
 ?>

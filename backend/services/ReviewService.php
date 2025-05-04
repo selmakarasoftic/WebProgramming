@@ -9,14 +9,17 @@ class ReviewService extends BaseService {
         parent::__construct($dao);
     }
 
+    // get all - koristi JOIN s users i cars pa ostaje custom
     public function getAllReviews() {
         return $this->dao->getAllReviews();
     }
 
+    // get one - koristi JOIN s users i cars pa ostaje custom
     public function getReviewById($id) {
         return $this->dao->getReviewById($id);
     }
 
+    // add - s validacijom
     public function createReview($data) {
         if (!isset($data['title']) || strlen($data['title']) < 3) {
             throw new Exception('Title must be at least 3 characters.');
@@ -27,21 +30,26 @@ class ReviewService extends BaseService {
         if (!isset($data['rating']) || $data['rating'] < 1 || $data['rating'] > 5) {
             throw new Exception('Rating must be between 1 and 5.');
         }
-        return $this->dao->addReview($data);
+        return $this->create($data); //BaseService
+
     }
 
+    // update - može koristiti BaseService::update()
     public function updateReview($id, $data) {
-        return $this->dao->updateReview($id, $data);
+        return $this->update($id, $data); // koristi BaseService::update()
     }
 
+    // delete - može koristiti BaseService::delete()
     public function deleteReview($id) {
-        return $this->dao->deleteReview($id);
+        return $this->delete($id); // koristi BaseService::delete()
     }
 
+    // isto kao i ostalo
     public function getReviewsByUser($user_id) {
         return $this->dao->getReviewsByUser($user_id);
     }
 
+    // isto zbog profila 
     public function countReviewsByUser($user_id) {
         return $this->dao->countReviewsByUser($user_id);
     }

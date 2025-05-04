@@ -6,7 +6,7 @@ class UserDao extends BaseDao {
         parent::__construct("users");
     }
 
-    // register
+    // register - može koristiti BaseDao::add() ako koristiš u service
     public function registerUser($data) {
         $stmt = $this->connection->prepare("
             INSERT INTO users (username, email, password)
@@ -23,7 +23,7 @@ class UserDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // get one
+    // get one - samo određena polja, pa ostaje
     public function getUserById($id) {
         $stmt = $this->connection->prepare("SELECT id, username, email, role, created_at FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id);
@@ -31,7 +31,7 @@ class UserDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // update
+    // update - koristiš BaseDao::update() ako koristiš sva polja (ali zadržaćemo tvoju custom)
     public function updateUser($id, $data) {
         $data['id'] = $id;
         $stmt = $this->connection->prepare("
@@ -40,7 +40,7 @@ class UserDao extends BaseDao {
             WHERE id = :id
         ");
         $stmt->execute($data);
-        return $stmt->rowCount(); // ✅ return number of affected rows
+        return $stmt->rowCount(); // return number of affected rows
     }
 
     // change pwd
@@ -62,12 +62,12 @@ class UserDao extends BaseDao {
         return $stmt->fetchAll();
     }
 
-    // obrisi 
+    // obrisi - može preko BaseDao::delete()
     public function deleteUser($id) {
         $stmt = $this->connection->prepare("DELETE FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id);
         $stmt->execute();
-        return $stmt->rowCount(); // ✅ return number of affected rows
+        return $stmt->rowCount(); // return number of affected rows
     }
 }
 ?>

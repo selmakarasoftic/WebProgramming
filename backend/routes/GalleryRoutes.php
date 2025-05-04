@@ -63,7 +63,12 @@ Flight::route('GET /gallery/@id', function ($id) {
  */
 Flight::route('POST /gallery', function () {
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::galleryService()->createGalleryItem($data));
+    $success = Flight::galleryService()->createGalleryItem($data);
+
+    Flight::json([
+        "success" => $success,
+        "message" => $success ? "Gallery item created successfully" : "Failed to create gallery item"
+    ]);
 });
 
 /**
@@ -85,7 +90,13 @@ Flight::route('POST /gallery', function () {
  * )
  */
 Flight::route('DELETE /gallery/@id', function ($id) {
-    Flight::json(Flight::galleryService()->deleteGalleryItem($id));
+    $rows = Flight::galleryService()->deleteGalleryItem($id);
+
+    Flight::json([
+        "success" => $rows > 0,
+        "deleted_id" => $id,
+        "message" => $rows > 0 ? "Gallery item deleted successfully" : "No item deleted (check ID)"
+    ]);
 });
 
 /**
@@ -109,4 +120,3 @@ Flight::route('DELETE /gallery/@id', function ($id) {
 Flight::route('GET /gallery/user/@user_id', function ($user_id) {
     Flight::json(Flight::galleryService()->getGalleryItemsByUser($user_id));
 });
-?>
