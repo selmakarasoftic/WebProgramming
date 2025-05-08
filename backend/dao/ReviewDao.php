@@ -6,7 +6,7 @@ class ReviewDao extends BaseDao {
         parent::__construct("reviews");
     }
 
-    // get all
+    // get all - koristi JOIN s users i cars
     public function getAllReviews() {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -27,7 +27,7 @@ class ReviewDao extends BaseDao {
         return $stmt->fetchAll();
     }
 
-    // get one
+    // get one - koristi JOIN s users i cars
     public function getReviewById($id) {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -50,34 +50,9 @@ class ReviewDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // add
-    public function addReview($data) {
-        $stmt = $this->connection->prepare("
-            INSERT INTO reviews (user_id, car_id, title, review_text, rating)
-            VALUES (:user_id, :car_id, :title, :review_text, :rating)
-        ");
-        return $stmt->execute($data);
-    }
-
-    // update
-    public function updateReview($id, $data) {
-        $data['id'] = $id;
-        $stmt = $this->connection->prepare("
-            UPDATE reviews
-            SET title = :title,
-                review_text = :review_text,
-                rating = :rating
-            WHERE id = :id
-        ");
-        return $stmt->execute($data);
-    }
-
-    // delete
-    public function deleteReview($id) {
-        $stmt = $this->connection->prepare("DELETE FROM reviews WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
-    }
+    //  addReview se koristi preko BaseDao::add($data)
+    //  updateReview se koristi preko BaseDao::update($id, $data)
+    //  deleteReview se koristi preko BaseDao::delete($id)
 
     // isto kao i ostalo
     public function getReviewsByUser($user_id) {
@@ -88,7 +63,8 @@ class ReviewDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetchAll();
     }
-    //isto zbog profila 
+
+    // isto zbog profila 
     public function countReviewsByUser($user_id) {
         $stmt = $this->connection->prepare("
             SELECT COUNT(*) as total FROM reviews WHERE user_id = :user_id
@@ -97,6 +73,5 @@ class ReviewDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    
 }
 ?>

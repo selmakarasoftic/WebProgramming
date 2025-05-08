@@ -6,7 +6,7 @@ class GalleryDao extends BaseDao {
         parent::__construct("gallery");
     }
 
-    // get all
+    // get all - custom join, NOT in BaseDao
     public function getAllGalleryItems() {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -42,25 +42,12 @@ class GalleryDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // dodaj
-    public function addGalleryItem($data) {
-        $stmt = $this->connection->prepare("
-            INSERT INTO gallery (user_id, title, image_url)
-            VALUES (:user_id, :title, :image_url)
-        ");
-        return $stmt->execute($data);
-    }
+    // addGalleryItem  BaseDao::add()
+    // deleteGalleryItem BaseDao::delete()
 
-    // obrisi
-    public function deleteGalleryItem($id) {
-        $stmt = $this->connection->prepare("DELETE FROM gallery WHERE id = :id");
-        $stmt->bindParam(":id", $id);
-        return $stmt->execute();
-    }
-    
     // ovo vidjeti da mozda user moze da vidi
     // samo svoja dodana ako hoce al to moram na frontu dpdat
-    //isto kao za auta mozda samo button dodati neki 
+    // isto kao za auta mozda samo button dodati neki 
     public function getGalleryItemsByUser($user_id) {
         $stmt = $this->connection->prepare("
             SELECT * FROM gallery WHERE user_id = :user_id ORDER BY uploaded_at DESC

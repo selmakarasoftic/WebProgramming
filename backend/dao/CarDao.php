@@ -6,7 +6,7 @@ class CarDao extends BaseDao {
         parent::__construct("cars");
     }
 
-    //list all cars 
+    // Get all cars - custom join, NOT in BaseDao
     public function getAllCars() {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -25,8 +25,7 @@ class CarDao extends BaseDao {
         return $stmt->fetchAll();
     }
 
-//get car by id moram vidjei mogu li ghde ubaciti u projekt 
-
+    // Get car by ID - custom join, NOT in BaseDao
     public function getCarById($id) {
         $stmt = $this->connection->prepare("
             SELECT 
@@ -47,34 +46,7 @@ class CarDao extends BaseDao {
         return $stmt->fetch();
     }
 
-    // novo auto
-    public function addCar($data) {
-        $stmt = $this->connection->prepare("
-            INSERT INTO cars (user_id, model, year, engine, horsepower, image_url)
-            VALUES (:user_id, :model, :year, :engine, :horsepower, :image_url)
-        ");
-        return $stmt->execute($data);
-    }
-
-    // update
-    public function updateCar($id, $data) {
-        $data['id'] = $id;
-        $stmt = $this->connection->prepare("
-            UPDATE cars 
-            SET model = :model, year = :year, engine = :engine, horsepower = :horsepower, image_url = :image_url
-            WHERE id = :id
-        ");
-        return $stmt->execute($data);
-    }
-
-    // delete
-    public function deleteCar($id) {
-        $stmt = $this->connection->prepare("DELETE FROM cars WHERE id = :id");
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
-    }
-
-    // 🔍 Optional: Get all cars by a specific user (used in profile/dashboard)
+    // Get all cars by user - NOT in BaseDao (custom WHERE)
     public function getCarsByUser($user_id) {
         $stmt = $this->connection->prepare("SELECT * FROM cars WHERE user_id = :user_id");
         $stmt->bindParam(':user_id', $user_id);
@@ -92,7 +64,7 @@ class CarDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    
-}
 
+    //  addCar, updateCar, deleteCar are done through BaseDao
+}
 ?>
