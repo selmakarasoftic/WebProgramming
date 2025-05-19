@@ -9,6 +9,8 @@
  * )
  */
 Flight::route('GET /users', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     Flight::json(Flight::userService()->getAllUsers());
 });
 
@@ -22,7 +24,9 @@ Flight::route('GET /users', function () {
  * )
  */
 Flight::route('GET /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     Flight::json(Flight::userService()->getUserById($id));
+
 });
 
 /**
@@ -43,6 +47,8 @@ Flight::route('GET /users/@id', function ($id) {
  * )
  */
 Flight::route('POST /register', function () {
+//    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+// provjeri jel ovo treba ovdje 
     $data = Flight::request()->data->getData();
     $success = Flight::userService()->registerUser($data);
 
@@ -121,6 +127,7 @@ Flight::route('PUT /users/@id', function ($id) {
  * )
  */
 Flight::route('DELETE /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     $rows = Flight::userService()->deleteUser($id);
 
     Flight::json([

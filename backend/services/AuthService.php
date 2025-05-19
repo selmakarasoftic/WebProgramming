@@ -19,8 +19,11 @@ class AuthService extends BaseService {
 
 
    public function register($entity) {  
-       if (empty($entity['email']) || empty($entity['password'])) {
-           return ['success' => false, 'error' => 'Email and password are required.'];
+       if (!is_array($entity)) {
+        return ['success' => false, 'error' => 'Invalid request format.'];
+        }
+        if (empty($entity['email']) || empty($entity['password']) || empty($entity['username'])) {
+           return ['success' => false, 'error' => 'Email, password and username are required.'];
        }
 
 
@@ -33,7 +36,7 @@ class AuthService extends BaseService {
        $entity['password'] = password_hash($entity['password'], PASSWORD_BCRYPT);
 
 
-       $entity = parent::add($entity);
+       $entity = parent::create($entity);
 
 
        unset($entity['password']);

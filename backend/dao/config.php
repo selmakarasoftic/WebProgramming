@@ -28,7 +28,7 @@ class Database {
    }
     // JWT Secret Key Definition
     public static function JWT_SECRET() {
-           return 'your_key_string';
+           return 'SecureRandomString';
     }
 }
 ?>

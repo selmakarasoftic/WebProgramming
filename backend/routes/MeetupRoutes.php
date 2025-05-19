@@ -12,6 +12,7 @@
  * )
  */
 Flight::route('GET /meetups', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::meetupService()->getAllMeetups());
 });
 
@@ -38,6 +39,8 @@ Flight::route('GET /meetups', function () {
  * )
  */
 Flight::route('GET /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::meetupService()->getMeetupById($id));
 });
 
@@ -64,6 +67,8 @@ Flight::route('GET /meetups/@id', function ($id) {
  * )
  */
 Flight::route('POST /meetups', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $success = Flight::meetupService()->createMeetup($data);
     Flight::json([
@@ -100,6 +105,8 @@ Flight::route('POST /meetups', function () {
  * )
  */
 Flight::route('PUT /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $rows = Flight::meetupService()->updateMeetup($id, $data);
     Flight::json([
@@ -128,6 +135,8 @@ Flight::route('PUT /meetups/@id', function ($id) {
  * )
  */
 Flight::route('DELETE /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $rows = Flight::meetupService()->deleteMeetup($id);
     Flight::json([
         "success" => $rows > 0,

@@ -12,6 +12,8 @@
  * )
  */
 Flight::route('GET /gallery', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getAllGalleryItems());
 });
 
@@ -38,6 +40,8 @@ Flight::route('GET /gallery', function () {
  * )
  */
 Flight::route('GET /gallery/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getGalleryItemById($id));
 });
 
@@ -62,6 +66,8 @@ Flight::route('GET /gallery/@id', function ($id) {
  * )
  */
 Flight::route('POST /gallery', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $success = Flight::galleryService()->createGalleryItem($data);
 
@@ -90,6 +96,8 @@ Flight::route('POST /gallery', function () {
  * )
  */
 Flight::route('DELETE /gallery/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $rows = Flight::galleryService()->deleteGalleryItem($id);
 
     Flight::json([
@@ -118,5 +126,7 @@ Flight::route('DELETE /gallery/@id', function ($id) {
  * )
  */
 Flight::route('GET /gallery/user/@user_id', function ($user_id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getGalleryItemsByUser($user_id));
 });

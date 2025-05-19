@@ -8,7 +8,10 @@ require_once __DIR__ . '/services/UserService.php';
 require_once __DIR__ . '/services/GalleryService.php';
 require_once __DIR__ . '/services/MeetupService.php';
 require_once __DIR__ . '/services/AuthService.php';
+require_once __DIR__ . '/middleware/AuthMiddleware.php';
+require_once __DIR__ . '/data/roles.php';
 
+Flight::register('auth_middleware', 'AuthMiddleware');
 Flight::register('carService', 'CarService');
 Flight::register('reviewService', 'ReviewService');
 Flight::register('userService', 'UserService');
@@ -33,12 +36,14 @@ Flight::route('/*', function(){
 
     try {
         $token = Flight::request()->getHeader("Authentication");
-        if (!$token) {
+        /*if (!$token) {
             Flight::halt(401, "Missing authentication header");
         }
 
         $decoded = JWT::decode($token, new Key(Database::JWT_SECRET(), 'HS256'));
-        Flight::set('user', $decoded->user);
+        Flight::set('user', $decoded->user);*/
+        if(Flight::auth_middleware()->verifyToken($token))
+               return TRUE;
     } catch (Exception $e) {
         Flight::halt(401, $e->getMessage());
     }
