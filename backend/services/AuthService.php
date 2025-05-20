@@ -39,7 +39,7 @@ class AuthService extends BaseService {
        $entity = parent::create($entity);
 
 
-       unset($entity['password']);
+       //unset($entity['password']);
 
 
        return ['success' => true, 'data' => $entity];             
