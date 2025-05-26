@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="assets/css/spapp.css">
 </head>
 <body>
-    
     <div id="app" style="display: none;">
         <header>
             <h1>AutoVerse</h1>
@@ -24,37 +23,60 @@
                     <a href="#gallery">Gallery</a>
                     <a href="#" onclick="logoutUser()">Logout</a>
                 </div>
-            </div>
-            
-        </div>
+        </header>
         
-    </header>
-    
-    <main id="spapp">
-        <section id="home" data-load="pages/home.html"></section>
-        <section id="cars" data-load="pages/cars.html"></section>
-        <section id="reviews" data-load="pages/reviews.html"></section>
-        <section id="meetups" data-load="pages/meetups.html"></section>
-        <section id="profile" data-load="pages/profile.html"></section>
-        <section id="users" data-load="pages/users.html"></section>
-        <section id="gallery" data-load="pages/gallery.html"></section>
-        
-    </main>
-</div>
+        <main id="spapp">
+            <section id="home" data-load="pages/home.html"></section>
+            <section id="cars" data-load="pages/cars.html"></section>
+            <section id="reviews" data-load="pages/reviews.html"></section>
+            <section id="meetups" data-load="pages/meetups.html"></section>
+            <section id="profile" data-load="pages/profile.html"></section>
+            <section id="users" data-load="pages/users.html"></section>
+            <section id="gallery" data-load="pages/gallery.html"></section>
+        </main>
+    </div>
 
-<!-- Load jQuery first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- skripte -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/jquery.spapp.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script src="assets/js/users.js"></script>
+    <script src="assets/js/login.js" type="module"></script>
+    <script src="assets/js/reviews.js"></script>
+    <script src="assets/js/meetups.js"></script>
+    <script src="assets/js/home.js"></script>
+    <script src="assets/js/profile.js"></script>
+    <script src="assets/js/cars.js"></script>
 
-<script src="assets/js/jquery.spapp.min.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/custom.js"></script>
-<script src="assets/js/users.js"></script>
-<script src="assets/js/login.js"></script>
-<script src="assets/js/reviews.js"></script>
-<script src="assets/js/meetups.js"></script>
-<script src="assets/js/home.js"></script>
-<script src="assets/js/profile.js"></script>
-<script src="assets/js/cars.js"></script>
+    <script type="module">
+        //debugger; // za debugging 
+        import UserService from './services/user-service.js';
+        import Utils from './utils/utils.js';
+        import Constants from './utils/constants.js';
 
+        // jel login provjera
+        if (!window.location.pathname.includes('login.html')) {
+            // ako nije login provjeri credentials i token
+            const token = localStorage.getItem("user_token");
+            if (!token) {
+                window.location.replace("pages/login.html");
+            } else {
+                // inicijaliziraj
+                $(document).ready(function() {
+                    $('#spapp').spapp({
+                    });
+
+                    document.getElementById("app").style.display = "block";
+                    UserService.generateMenuItems();
+                });
+            }
+        }
+
+        // Expose services globally
+        window.UserService = UserService;
+        window.Utils = Utils;
+        window.Constants = Constants;
+    </script>
 </body>
 </html>

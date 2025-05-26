@@ -1,50 +1,57 @@
+import Constants from '../../utils/constants.js';
+import UserService from '../../services/user-service.js';
+
+$(document).ready(function() {
+    // Initialize form validation
+    $("#register-form").validate({
+        rules: {
+            username: {
+                required: true,
+                minlength: 3
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            password: {
+                required: true,
+                minlength: 6
+            },
+            confirmPassword: {
+                required: true,
+                equalTo: "#registerPassword"
+            }
+        },
+        messages: {
+            username: {
+                required: "Please enter a username",
+                minlength: "Username must be at least 3 characters long"
+            },
+            email: {
+                required: "Please enter an email address",
+                email: "Please enter a valid email address"
+            },
+            password: {
+                required: "Please enter a password",
+                minlength: "Password must be at least 6 characters long"
+            },
+            confirmPassword: {
+                required: "Please confirm your password",
+                equalTo: "Passwords do not match"
+            }
+        },
+        submitHandler: function(form) {
+            event.preventDefault();
+            registerUser();
+            return false;
+        }
+    });
+});
+
 function registerUser() {
-    const username = document.getElementById("registerUsername").value.trim();
-    const email = document.getElementById("registerEmail").value.trim();
-    const password = document.getElementById("registerPassword").value.trim();
-    const confirmPassword = document.getElementById("registerConfirmPassword").value.trim();
-    const role = "guest"; // Default role for new users
-    const message = document.getElementById("registerMessage");
+    const username = $("#registerUsername").val().trim();
+    const email = $("#registerEmail").val().trim();
+    const password = $("#registerPassword").val().trim();
 
-    if (!username || !email || !password || !confirmPassword) {
-        message.textContent = "Please fill out all fields!";
-        message.style.color = "darkred";
-        return;
-    }
-
-    if (!validateEmail(email)) {
-        message.textContent = "Please enter a valid email address!";
-        message.style.color = "darkred";
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        message.textContent = "Passwords do not match!";
-        message.style.color = "darkred";
-        return;
-    }
-
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-    
-    const userExists = existingUsers.find(user => user.username === username || user.email === email);
-    if (userExists) {
-        message.textContent = "Username or email already exists!";
-        message.style.color = "darkred";
-        return;
-    }
-
-    const newUser = { username, email, password, role, registered: new Date().toLocaleDateString() };
-    existingUsers.push(newUser);
-    localStorage.setItem("users", JSON.stringify(existingUsers));
-    localStorage.setItem("loggedInUser", JSON.stringify(newUser));
-
-    message.textContent = "Registration successful! Redirecting...";
-    message.style.color = "green";
-
-    setTimeout(() => window.location.href = "../index.html#home", 1000);
-}
-
-function validateEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    UserService.register(username, email, password);
 }
