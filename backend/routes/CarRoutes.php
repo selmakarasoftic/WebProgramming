@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/cars",
  *     summary="Get all cars",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Response(
  *         response=200,
@@ -11,6 +12,7 @@
  *     )
  * )
  */
+
 Flight::route('GET /cars', function () {
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::carService()->getAllCars());
@@ -20,6 +22,7 @@ Flight::route('GET /cars', function () {
  * @OA\Get(
  *     path="/cars/{id}",
  *     summary="Get a car by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",
@@ -42,6 +45,7 @@ Flight::route('GET /cars/@id', function ($id) {
  * @OA\Post(
  *     path="/cars",
  *     summary="Add a new car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\RequestBody(
  *         required=true,
@@ -71,6 +75,7 @@ Flight::route('POST /cars', function () {
  * @OA\Put(
  *     path="/cars/{id}",
  *     summary="Update a car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",
@@ -107,6 +112,7 @@ Flight::route('PUT /cars/@id', function ($id) {
  * @OA\Delete(
  *     path="/cars/{id}",
  *     summary="Delete a car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",

@@ -8,12 +8,15 @@ class AuthMiddleware {
         if (!$token) {
             Flight::halt(401, "Missing authentication header");
         }
+        try{
+            $decoded_token = JWT::decode($token, new Key(Database::JWT_SECRET(), 'HS256'));
+            Flight::set('user', $decoded_token->user);
+            Flight::set('jwt_token', $token);
+            return TRUE;
+        } catch (\Exception $e) {
+            Flight::halt(401, "Invalid token: " . $e->getMessage());
+        }
 
-        $decoded_token = JWT::decode($token, new Key(Database::JWT_SECRET(), 'HS256'));
-        Flight::set('user', $decoded_token->user);
-        Flight::set('jwt_token', $token);
-
-        return TRUE;
     }
 
     public function authorizeRole($requiredRole) {

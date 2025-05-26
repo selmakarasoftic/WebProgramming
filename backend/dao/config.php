@@ -5,7 +5,11 @@ class Database {
    private static $username = 'root';
    private static $password = '';
    private static $connection = null;
-
+   // JWT Secret Key Definition
+   public static function JWT_SECRET() {
+          return 'SecureRandomString';
+   }
+   
 
    public static function connect() {
        if (self::$connection === null) {
@@ -26,9 +30,5 @@ class Database {
        }
        return self::$connection;
    }
-    // JWT Secret Key Definition
-    public static function JWT_SECRET() {
-           return 'SecureRandomString';
-    }
 }
 ?>

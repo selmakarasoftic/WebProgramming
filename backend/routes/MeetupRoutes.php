@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/meetups",
  *     summary="Get all meetups",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Response(
  *         response=200,
@@ -20,6 +21,7 @@ Flight::route('GET /meetups', function () {
  * @OA\Get(
  *     path="/meetups/{id}",
  *     summary="Get a meetup by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Parameter(
  *         name="id",
@@ -48,6 +50,7 @@ Flight::route('GET /meetups/@id', function ($id) {
  * @OA\Post(
  *     path="/meetups",
  *     summary="Create a new meetup",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\RequestBody(
  *         required=true,
@@ -82,6 +85,8 @@ Flight::route('POST /meetups', function () {
  *     path="/meetups/{id}",
  *     summary="Update a meetup",
  *     tags={"Meetups"},
+ *     security={{"ApiKey": {}}},
+ * 
  *     @OA\Parameter(
  *         name="id",
  *         in="path",
@@ -120,6 +125,7 @@ Flight::route('PUT /meetups/@id', function ($id) {
  * @OA\Delete(
  *     path="/meetups/{id}",
  *     summary="Delete a meetup",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Parameter(
  *         name="id",

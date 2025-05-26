@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/reviews",
  *     summary="Get all reviews",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Response(response=200, description="List of reviews")
  * )
@@ -17,6 +18,7 @@ Flight::route('GET /reviews', function() {
  * @OA\Get(
  *     path="/reviews/{id}",
  *     summary="Get a review by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Review details"),
@@ -32,6 +34,7 @@ Flight::route('GET /reviews/@id', function($id) {
  * @OA\Post(
  *     path="/reviews",
  *     summary="Add a new review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\RequestBody(
  *         required=true,
@@ -61,6 +64,7 @@ Flight::route('POST /reviews', function() {
  * @OA\Put(
  *     path="/reviews/{id}",
  *     summary="Update a review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\RequestBody(
@@ -89,6 +93,7 @@ Flight::route('PUT /reviews/@id', function($id) {
  * @OA\Delete(
  *     path="/reviews/{id}",
  *     summary="Delete a review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Review deleted")
