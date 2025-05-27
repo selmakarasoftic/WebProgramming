@@ -4,11 +4,13 @@
  * @OA\Get(
  *     path="/reviews",
  *     summary="Get all reviews",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Response(response=200, description="List of reviews")
  * )
  */
 Flight::route('GET /reviews', function() {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::reviewService()->getAllReviews());
 });
 
@@ -16,6 +18,7 @@ Flight::route('GET /reviews', function() {
  * @OA\Get(
  *     path="/reviews/{id}",
  *     summary="Get a review by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Review details"),
@@ -23,6 +26,7 @@ Flight::route('GET /reviews', function() {
  * )
  */
 Flight::route('GET /reviews/@id', function($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::reviewService()->getReviewById($id));
 });
 
@@ -30,6 +34,7 @@ Flight::route('GET /reviews/@id', function($id) {
  * @OA\Post(
  *     path="/reviews",
  *     summary="Add a new review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\RequestBody(
  *         required=true,
@@ -46,6 +51,7 @@ Flight::route('GET /reviews/@id', function($id) {
  * )
  */
 Flight::route('POST /reviews', function() {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     $data = Flight::request()->data->getData();
     $success = Flight::reviewService()->createReview($data);
     Flight::json([
@@ -58,6 +64,7 @@ Flight::route('POST /reviews', function() {
  * @OA\Put(
  *     path="/reviews/{id}",
  *     summary="Update a review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\RequestBody(
@@ -72,6 +79,7 @@ Flight::route('POST /reviews', function() {
  * )
  */
 Flight::route('PUT /reviews/@id', function($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     $data = Flight::request()->data->getData();
     $rows = Flight::reviewService()->updateReview($id, $data);
     Flight::json([
@@ -85,12 +93,14 @@ Flight::route('PUT /reviews/@id', function($id) {
  * @OA\Delete(
  *     path="/reviews/{id}",
  *     summary="Delete a review",
+ *     security={{"ApiKey": {}}},
  *     tags={"Reviews"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="Review deleted")
  * )
  */
 Flight::route('DELETE /reviews/@id', function($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     $rows = Flight::reviewService()->deleteReview($id);
     Flight::json([
         "success" => $rows > 0,

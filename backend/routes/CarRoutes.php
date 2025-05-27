@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/cars",
  *     summary="Get all cars",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Response(
  *         response=200,
@@ -11,7 +12,9 @@
  *     )
  * )
  */
+
 Flight::route('GET /cars', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::carService()->getAllCars());
 });
 
@@ -19,6 +22,7 @@ Flight::route('GET /cars', function () {
  * @OA\Get(
  *     path="/cars/{id}",
  *     summary="Get a car by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",
@@ -33,6 +37,7 @@ Flight::route('GET /cars', function () {
  * )
  */
 Flight::route('GET /cars/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::carService()->getCarById($id));
 });
 
@@ -40,6 +45,7 @@ Flight::route('GET /cars/@id', function ($id) {
  * @OA\Post(
  *     path="/cars",
  *     summary="Add a new car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\RequestBody(
  *         required=true,
@@ -58,6 +64,7 @@ Flight::route('GET /cars/@id', function ($id) {
  */
 Flight::route('POST /cars', function () {
     $data = Flight::request()->data->getData();
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json([
         "success" => Flight::carService()->createCar($data),
         "message" => "Car created successfully"
@@ -68,6 +75,7 @@ Flight::route('POST /cars', function () {
  * @OA\Put(
  *     path="/cars/{id}",
  *     summary="Update a car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",
@@ -89,6 +97,7 @@ Flight::route('POST /cars', function () {
  * )
  */
 Flight::route('PUT /cars/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     $data = Flight::request()->data->getData();
     $rows = Flight::carService()->updateCar($id, $data);
 
@@ -103,6 +112,7 @@ Flight::route('PUT /cars/@id', function ($id) {
  * @OA\Delete(
  *     path="/cars/{id}",
  *     summary="Delete a car",
+ *     security={{"ApiKey": {}}},
  *     tags={"Cars"},
  *     @OA\Parameter(
  *         name="id",
@@ -115,6 +125,8 @@ Flight::route('PUT /cars/@id', function ($id) {
  */
 Flight::route('DELETE /cars/@id', function ($id) {
     $rows = Flight::carService()->deleteCar($id);
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
 
     Flight::json([
         "success" => $rows > 0,

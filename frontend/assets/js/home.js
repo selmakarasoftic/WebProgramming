@@ -1,16 +1,27 @@
 function initHome() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const userDataString = localStorage.getItem("user_data");
     const welcomeMessage = document.getElementById("welcomeMessage");
     const adminInfo = document.getElementById("adminInfo");
     const highlightsContainer = document.getElementById("latestHighlights");
 
     if (!welcomeMessage || !adminInfo || !highlightsContainer) return;
 
+    let user = null;
+    if (userDataString) {
+        try {
+            user = JSON.parse(userDataString);
+        } catch (e) {
+            console.error("Error parsing user data from localStorage:", e);
+            localStorage.removeItem("user_data");
+        }
+    }
+
     if (user && user.role === "admin") {
         welcomeMessage.innerHTML = `👋 Welcome back, <strong>Admin ${user.username}</strong>!`;
         adminInfo.style.display = "block";
     } else {
-        welcomeMessage.innerHTML = `👋 Welcome, <strong>${user ? user.username : "Guest"}</strong>!`;
+        // ako nije admin
+        welcomeMessage.innerHTML = `👋 Welcome, <strong>${user && user.username ? user.username : "Guest"}</strong>!`;
         adminInfo.style.display = "none";
     }
 

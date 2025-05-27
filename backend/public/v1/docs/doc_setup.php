@@ -25,6 +25,6 @@ error_reporting(E_ALL);
 *     securityScheme="ApiKey",
 *     type="apiKey",
 *     in="header",
-*     name="Authentication"
+*     name="Authorization"
 * )
 */

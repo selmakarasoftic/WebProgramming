@@ -4,11 +4,14 @@
  * @OA\Get(
  *     path="/users",
  *     summary="Get all users (admin only)",
+ *     security={{"ApiKey": {}}},
  *     tags={"Users"},
  *     @OA\Response(response=200, description="List of users")
  * )
  */
 Flight::route('GET /users', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     Flight::json(Flight::userService()->getAllUsers());
 });
 
@@ -16,13 +19,16 @@ Flight::route('GET /users', function () {
  * @OA\Get(
  *     path="/users/{id}",
  *     summary="Get a user by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Users"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="User info")
  * )
  */
 Flight::route('GET /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     Flight::json(Flight::userService()->getUserById($id));
+
 });
 
 /**
@@ -44,6 +50,11 @@ Flight::route('GET /users/@id', function ($id) {
  */
 Flight::route('POST /register', function () {
     $data = Flight::request()->data->getData();
+    
+    // Validate request data
+    Flight::validation_middleware()->validateRegistration($data);
+    
+    $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
     $success = Flight::userService()->registerUser($data);
 
     Flight::json([
@@ -70,6 +81,10 @@ Flight::route('POST /register', function () {
  */
 Flight::route('POST /login', function () {
     $data = Flight::request()->data->getData();
+    
+    // Validate request data
+    Flight::validation_middleware()->validateLogin($data);
+    
     try {
         $user = Flight::userService()->loginUser($data['email'], $data['password']);
         Flight::json([
@@ -115,12 +130,14 @@ Flight::route('PUT /users/@id', function ($id) {
  * @OA\Delete(
  *     path="/users/{id}",
  *     summary="Delete a user",
+ *     security={{"ApiKey": {}}},
  *     tags={"Users"},
  *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
  *     @OA\Response(response=200, description="User deleted")
  * )
  */
 Flight::route('DELETE /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     $rows = Flight::userService()->deleteUser($id);
 
     Flight::json([

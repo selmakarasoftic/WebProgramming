@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/gallery",
  *     summary="Get all gallery items",
+ *     security={{"ApiKey": {}}},
  *     tags={"Gallery"},
  *     @OA\Response(
  *         response=200,
@@ -12,6 +13,8 @@
  * )
  */
 Flight::route('GET /gallery', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getAllGalleryItems());
 });
 
@@ -19,6 +22,7 @@ Flight::route('GET /gallery', function () {
  * @OA\Get(
  *     path="/gallery/{id}",
  *     summary="Get a gallery item by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Gallery"},
  *     @OA\Parameter(
  *         name="id",
@@ -38,6 +42,8 @@ Flight::route('GET /gallery', function () {
  * )
  */
 Flight::route('GET /gallery/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getGalleryItemById($id));
 });
 
@@ -45,6 +51,7 @@ Flight::route('GET /gallery/@id', function ($id) {
  * @OA\Post(
  *     path="/gallery",
  *     summary="Add a new gallery item",
+ *     security={{"ApiKey": {}}},
  *     tags={"Gallery"},
  *     @OA\RequestBody(
  *         required=true,
@@ -62,6 +69,8 @@ Flight::route('GET /gallery/@id', function ($id) {
  * )
  */
 Flight::route('POST /gallery', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $success = Flight::galleryService()->createGalleryItem($data);
 
@@ -75,6 +84,7 @@ Flight::route('POST /gallery', function () {
  * @OA\Delete(
  *     path="/gallery/{id}",
  *     summary="Delete a gallery item",
+ *     security={{"ApiKey": {}}},
  *     tags={"Gallery"},
  *     @OA\Parameter(
  *         name="id",
@@ -90,6 +100,8 @@ Flight::route('POST /gallery', function () {
  * )
  */
 Flight::route('DELETE /gallery/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $rows = Flight::galleryService()->deleteGalleryItem($id);
 
     Flight::json([
@@ -103,6 +115,7 @@ Flight::route('DELETE /gallery/@id', function ($id) {
  * @OA\Get(
  *     path="/gallery/user/{user_id}",
  *     summary="Get gallery items by user ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Gallery"},
  *     @OA\Parameter(
  *         name="user_id",
@@ -118,5 +131,7 @@ Flight::route('DELETE /gallery/@id', function ($id) {
  * )
  */
 Flight::route('GET /gallery/user/@user_id', function ($user_id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::galleryService()->getGalleryItemsByUser($user_id));
 });

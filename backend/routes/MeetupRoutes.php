@@ -4,6 +4,7 @@
  * @OA\Get(
  *     path="/meetups",
  *     summary="Get all meetups",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Response(
  *         response=200,
@@ -12,6 +13,7 @@
  * )
  */
 Flight::route('GET /meetups', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::meetupService()->getAllMeetups());
 });
 
@@ -19,6 +21,7 @@ Flight::route('GET /meetups', function () {
  * @OA\Get(
  *     path="/meetups/{id}",
  *     summary="Get a meetup by ID",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Parameter(
  *         name="id",
@@ -38,6 +41,8 @@ Flight::route('GET /meetups', function () {
  * )
  */
 Flight::route('GET /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
     Flight::json(Flight::meetupService()->getMeetupById($id));
 });
 
@@ -45,6 +50,7 @@ Flight::route('GET /meetups/@id', function ($id) {
  * @OA\Post(
  *     path="/meetups",
  *     summary="Create a new meetup",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\RequestBody(
  *         required=true,
@@ -64,6 +70,8 @@ Flight::route('GET /meetups/@id', function ($id) {
  * )
  */
 Flight::route('POST /meetups', function () {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $success = Flight::meetupService()->createMeetup($data);
     Flight::json([
@@ -77,6 +85,8 @@ Flight::route('POST /meetups', function () {
  *     path="/meetups/{id}",
  *     summary="Update a meetup",
  *     tags={"Meetups"},
+ *     security={{"ApiKey": {}}},
+ * 
  *     @OA\Parameter(
  *         name="id",
  *         in="path",
@@ -100,6 +110,8 @@ Flight::route('POST /meetups', function () {
  * )
  */
 Flight::route('PUT /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $data = Flight::request()->data->getData();
     $rows = Flight::meetupService()->updateMeetup($id, $data);
     Flight::json([
@@ -113,6 +125,7 @@ Flight::route('PUT /meetups/@id', function ($id) {
  * @OA\Delete(
  *     path="/meetups/{id}",
  *     summary="Delete a meetup",
+ *     security={{"ApiKey": {}}},
  *     tags={"Meetups"},
  *     @OA\Parameter(
  *         name="id",
@@ -128,6 +141,8 @@ Flight::route('PUT /meetups/@id', function ($id) {
  * )
  */
 Flight::route('DELETE /meetups/@id', function ($id) {
+        Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+
     $rows = Flight::meetupService()->deleteMeetup($id);
     Flight::json([
         "success" => $rows > 0,
