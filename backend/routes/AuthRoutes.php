@@ -1,6 +1,11 @@
 <?php
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+Flight::route('OPTIONS /@path', function($path) {
+    // Log and allow preflight
+    error_log("CORS Preflight for: /auth/$path");
+    http_response_code(204);
+});
 Flight::group('/auth', function() {
    /**
     * @OA\Post(
