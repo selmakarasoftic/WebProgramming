@@ -86,12 +86,12 @@ Flight::route('/*', function(){
 
         $token = $authHeader;
         error_log("Token received: " . $token);
-        
+
         // Use middleware to verify token and set user data
         Flight::auth_middleware()->verifyToken($token);
-        
+
         return true;
-        
+
     } catch (Exception $e) {
         error_log("JWT Error: " . $e->getMessage());
         Flight::halt(401, json_encode([
@@ -114,5 +114,3 @@ require_once __DIR__ . '/routes/AuthRoutes.php';
 
 Flight::start();
 
-
-?>
