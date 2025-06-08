@@ -14,7 +14,6 @@
 
     <div class="add-review">
         <h3 style="color: steelblue;">Add a New Review</h3>
-        <input type="text" id="reviewerName" placeholder="Your Name">
         <input type="text" id="reviewTitle" placeholder="Review Title (e.g., Car Name or Part)">
         <textarea id="reviewContent" placeholder="Your Review"></textarea>
         <select id="reviewRating">
@@ -24,9 +23,9 @@
             <option value="2">⭐⭐☆☆☆</option>
             <option value="1">⭐☆☆☆☆</option>
         </select>
-        <input type="file" id="reviewImages" accept="image/*" multiple>
         <button onclick="addReview()">➕ Add Review</button>
     </div>
 
+    <script type="module" src="../assets/js/reviews.js"></script>
 </body>
 </html>

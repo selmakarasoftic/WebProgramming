@@ -39,4 +39,8 @@ class AuthMiddleware {
             Flight::halt(403, 'Access denied: permission missing');
         }
     }
+
+    public function getLoggedInUser() {
+        return Flight::get('user');
+    }
 }

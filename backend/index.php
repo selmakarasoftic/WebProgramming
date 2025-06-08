@@ -9,11 +9,11 @@ require_once __DIR__ . '/services/GalleryService.php';
 require_once __DIR__ . '/services/MeetupService.php';
 require_once __DIR__ . '/services/AuthService.php';
 require_once __DIR__ . '/middleware/AuthMiddleware.php';
-//require_once __DIR__ . '/middleware/ValidationMiddleware.php';
+require_once __DIR__ . '/middleware/ValidationMiddleware.php';
 require_once __DIR__ . '/data/roles.php';
 
 Flight::register('auth_middleware', 'AuthMiddleware');
-//Flight::register('validation_middleware', 'ValidationMiddleware');
+Flight::register('validation_middleware', 'ValidationMiddleware');
 Flight::register('carService', 'CarService');
 Flight::register('reviewService', 'ReviewService');
 Flight::register('userService', 'UserService');

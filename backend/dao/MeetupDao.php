@@ -61,6 +61,24 @@ class MeetupDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetch()['total'];
     }
-    
+
+    public function getLatestMeetup() {
+        $stmt = $this->connection->prepare("
+            SELECT 
+                m.id,
+                m.title,
+                m.date,
+                m.location,
+                m.description,
+                u.username AS organizer_name,
+                u.id AS organizer_id
+            FROM meetups m
+            JOIN users u ON m.organizer_id = u.id
+            ORDER BY m.id DESC
+            LIMIT 1
+        ");
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 }
 ?>

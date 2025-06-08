@@ -21,7 +21,7 @@ class ReviewDao extends BaseDao {
                 c.image_url AS car_image
             FROM reviews r
             JOIN users u ON r.user_id = u.id
-            JOIN cars c ON r.car_id = c.id
+            LEFT JOIN cars c ON r.car_id = c.id
         ");
         $stmt->execute();
         return $stmt->fetchAll();
@@ -42,7 +42,7 @@ class ReviewDao extends BaseDao {
                 c.image_url AS car_image
             FROM reviews r
             JOIN users u ON r.user_id = u.id
-            JOIN cars c ON r.car_id = c.id
+            LEFT JOIN cars c ON r.car_id = c.id
             WHERE r.id = :id
         ");
         $stmt->bindParam(':id', $id);
@@ -72,6 +72,28 @@ class ReviewDao extends BaseDao {
         $stmt->bindParam(":user_id", $user_id);
         $stmt->execute();
         return $stmt->fetch()['total'];
+    }
+
+    public function getLatestReview() {
+        $stmt = $this->connection->prepare("
+            SELECT 
+                r.id,
+                r.title,
+                r.review_text,
+                r.rating,
+                r.user_id,
+                r.car_id,
+                u.username AS reviewer_name,
+                c.model AS car_model,
+                c.image_url AS car_image
+            FROM reviews r
+            JOIN users u ON r.user_id = u.id
+            LEFT JOIN cars c ON r.car_id = c.id
+            ORDER BY r.id DESC
+            LIMIT 1
+        ");
+        $stmt->execute();
+        return $stmt->fetch();
     }
 }
 ?>

@@ -1,10 +1,15 @@
-function initHome() {
+import CarService from '../../services/car-service.js';
+import ReviewService from '../../services/review-service.js';
+import MeetupService from '../../services/meetup-service.js';
+
+window.initHome = function () {
+    InitHome();
+}
+function InitHome() {
     const userDataString = localStorage.getItem("user_data");
     const welcomeMessage = document.getElementById("welcomeMessage");
     const adminInfo = document.getElementById("adminInfo");
     const highlightsContainer = document.getElementById("latestHighlights");
-
-    if (!welcomeMessage || !adminInfo || !highlightsContainer) return;
 
     let user = null;
     if (userDataString) {
@@ -19,6 +24,7 @@ function initHome() {
     if (user && user.role === "admin") {
         welcomeMessage.innerHTML = `👋 Welcome back, <strong>Admin ${user.username}</strong>!`;
         adminInfo.style.display = "block";
+        setupAdminButtons();
     } else {
         // ako nije admin
         welcomeMessage.innerHTML = `👋 Welcome, <strong>${user && user.username ? user.username : "Guest"}</strong>!`;
@@ -26,61 +32,90 @@ function initHome() {
     }
 
     renderHighlights();
-    setupAdminButtons();
 }
 
 function renderHighlights() {
     const highlightsContainer = document.getElementById("latestHighlights");
     if (!highlightsContainer) return;
 
-    highlightsContainer.innerHTML = "";
-
-    const cars = JSON.parse(localStorage.getItem("cars")) || [];
-    const reviews = JSON.parse(localStorage.getItem("reviews")) || [];
-    const meetups = JSON.parse(localStorage.getItem("meetups")) || [];
+    highlightsContainer.innerHTML = "<p>Loading highlights...</p>";
 
     let highlights = [];
 
-    if (cars.length > 0) {
-        const latestCar = cars[cars.length - 1];
-        highlights.push({
-            type: "car",
-            title: `🚗 ${latestCar.model}`,
-            description: `Latest car added: <strong>${latestCar.model}</strong> (${latestCar.year})`
+    const fetchLatestCar = new Promise((resolve) => {
+        CarService.getLatestCar(
+            (car) => {
+                if (car) {
+                    highlights.push({
+                        type: "car",
+                        title: `🚗 ${car.model}`,
+                        description: `Latest car added: <strong>${car.model}</strong> (${car.year})`
+                    });
+                }
+                resolve();
+            },
+            (xhr) => {
+                console.error("Error fetching latest car:", xhr.responseText);
+                resolve(); // Resolve even on error to allow other fetches to complete
+            }
+        );
+    });
+
+    const fetchLatestReview = new Promise((resolve) => {
+        ReviewService.getLatestReview(
+            (review) => {
+                if (review) {
+                    highlights.push({
+                        type: "review",
+                        title: `⭐ ${review.title}`,
+                        description: `<strong>${review.reviewer_name}</strong> says: "${review.review_text}"`
+                    });
+                }
+                resolve();
+            },
+            (xhr) => {
+                console.error("Error fetching latest review:", xhr.responseText);
+                resolve();
+            }
+        );
+    });
+
+    const fetchLatestMeetup = new Promise((resolve) => {
+        MeetupService.getLatestMeetup(
+            (meetup) => {
+                if (meetup) {
+                    highlights.push({
+                        type: "meetup",
+                        title: `📅 ${meetup.title}`,
+                        description: `Next Meetup: <strong>${meetup.title}</strong> at ${meetup.location} on ${meetup.date}`
+                    });
+                }
+                resolve();
+            },
+            (xhr) => {
+                console.error("Error fetching latest meetup:", xhr.responseText);
+                resolve();
+            }
+        );
+    });
+
+    Promise.all([fetchLatestCar, fetchLatestReview, fetchLatestMeetup]).then(() => {
+        highlightsContainer.innerHTML = ""; // Clear loading message
+
+        if (highlights.length === 0) {
+            highlightsContainer.innerHTML = "<p>No highlights available yet!</p>";
+            return;
+        }
+
+        highlights.forEach((highlight) => {
+            const highlightCard = document.createElement("div");
+            highlightCard.classList.add("highlight-card");
+            highlightCard.innerHTML = `
+                <h4>${highlight.title}</h4>
+                <p>${highlight.description}</p>
+            `;
+            highlightsContainer.appendChild(highlightCard);
         });
-    }
-
-    if (reviews.length > 0) {
-        const latestReview = reviews[reviews.length - 1];
-        highlights.push({
-            type: "review",
-            title: `⭐ ${latestReview.title}`,
-            description: `<strong>${latestReview.name}</strong> says: "${latestReview.content}"`
-        });
-    }
-
-    if (meetups.length > 0) {
-        const latestMeetup = meetups[meetups.length - 1];
-        highlights.push({
-            type: "meetup",
-            title: `📅 ${latestMeetup.title}`,
-            description: `Next Meetup: <strong>${latestMeetup.title}</strong> at ${latestMeetup.location} on ${latestMeetup.date}`
-        });
-    }
-
-    if (highlights.length === 0) {
-        highlightsContainer.innerHTML = "<p>No highlights available yet!</p>";
-        return;
-    }
-
-    highlights.forEach((highlight) => {
-        const highlightCard = document.createElement("div");
-        highlightCard.classList.add("highlight-card");
-        highlightCard.innerHTML = `
-            <h4>${highlight.title}</h4>
-            <p>${highlight.description}</p>
-        `;
-        highlightsContainer.appendChild(highlightCard);
     });
 }
 
@@ -99,3 +134,13 @@ $(document).on("spapp:ready", function () {
         initHome();
     }
 });
+$(document).on("spapp:ready", function () {
+    initHome(); // Always run on load
+});
+
+$(document).on("spapp:changed", function (e, page) {
+    if (page === "home") {
+        initHome(); // Run every time #home is navigated to
+    }
+});
+

@@ -53,5 +53,9 @@ class ReviewService extends BaseService {
     public function countReviewsByUser($user_id) {
         return $this->dao->countReviewsByUser($user_id);
     }
+
+    public function getLatestReview() {
+        return $this->dao->getLatestReview();
+    }
 }
 ?>

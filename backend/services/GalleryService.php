@@ -33,6 +33,18 @@ class GalleryService extends BaseService {
 
     }
 
+    public function updateGalleryItem($id, $data) {
+        // Business Logic: Validate before updating
+        if (!isset($data['title']) || strlen($data['title']) < 3) {
+            throw new Exception('Title must be at least 3 characters.');
+        }
+        // Image URL might not be updated every time, so check if it's provided and not empty
+        if (isset($data['image_url']) && empty($data['image_url'])) {
+            throw new Exception('Image URL cannot be empty if provided.');
+        }
+        return $this->update($id, $data); // koristi BaseService update(), which calls BaseDao::update()
+    }
+
     // obrisi - koristi BaseService::delete()
     public function deleteGalleryItem($id) {
         return $this->delete($id); // oristi BaseService::delete()

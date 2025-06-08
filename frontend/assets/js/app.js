@@ -14,7 +14,7 @@ $(document).ready(function () {
         { view: "meetups", load: "meetups.html", init: typeof initMeetups === "function" ? initMeetups : null },
         { view: "profile", load: "profile.html", init: typeof initProfile === "function" ? initProfile : null },
         { view: "users", load: "users.html", init: typeof initAdminPage === "function" ? initAdminPage : null },
-        { view: "gallery", load: "gallery.html", init: typeof initGalleryPage === "function" ? initGalleryPage : null }
+        { view: "gallery", load: "gallery.html", init: typeof initGallery === "function" ? initGallery : null }
     
     ];
 

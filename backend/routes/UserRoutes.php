@@ -26,7 +26,7 @@ Flight::route('GET /users', function () {
  * )
  */
 Flight::route('GET /users/@id', function ($id) {
-    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
     Flight::json(Flight::userService()->getUserById($id));
 
 });
@@ -102,6 +102,47 @@ Flight::route('POST /login', function () {
 
 /**
  * @OA\Put(
+ *     path="/users/{id}/password",
+ *     summary="Change user password",
+ *     tags={"Users"},
+ *     security={{"ApiKey": {}}},
+ *     @OA\Parameter(name="id", in="path", required=true, description="User ID", @OA\Schema(type="integer")),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"old_password", "new_password"},
+ *             @OA\Property(property="old_password", type="string"),
+ *             @OA\Property(property="new_password", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(response=200, description="Password changed successfully"),
+ *     @OA\Response(response=400, description="Invalid input"),
+ *     @OA\Response(response=401, description="Unauthorized"),
+ *     @OA\Response(response=403, description="Forbidden")
+ * )
+ */
+Flight::route('PUT /users/@id/password', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
+    $logged_in_user = Flight::get('user');
+    if ($logged_in_user->id != $id && $logged_in_user->role !== Roles::ADMIN) {
+        Flight::json(["success" => false, "message" => "Forbidden: You can only change your own password."], 403);
+        return;
+    }
+
+    $data = Flight::request()->data->getData();
+    Flight::validation_middleware()->validatePasswordChange($data);
+
+    try {
+        $success = Flight::userService()->changePassword($id, $data['old_password'], $data['new_password']);
+        Flight::json(["success" => $success, "message" => $success ? "Password changed successfully" : "Failed to change password."]);
+    } catch (Exception $e) {
+        Flight::json(["success" => false, "message" => $e->getMessage()], 400);
+    }
+});
+
+/**
+ * @OA\Put(
  *     path="/users/{id}",
  *     summary="Update a user",
  *     tags={"Users"},
@@ -117,6 +158,7 @@ Flight::route('POST /login', function () {
  * )
  */
 Flight::route('PUT /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
     $data = Flight::request()->data->getData();
     $rows = Flight::userService()->updateUser($id, $data);
 
@@ -137,7 +179,14 @@ Flight::route('PUT /users/@id', function ($id) {
  * )
  */
 Flight::route('DELETE /users/@id', function ($id) {
-    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
+    $logged_in_user = Flight::get('user');
+    if ($logged_in_user->id != $id && $logged_in_user->role !== Roles::ADMIN) {
+        Flight::json(["success" => false, "message" => "Forbidden: You can only delete your own account."], 403);
+        return;
+    }
+
     $rows = Flight::userService()->deleteUser($id);
 
     Flight::json([

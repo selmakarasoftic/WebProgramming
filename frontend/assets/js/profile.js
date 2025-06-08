@@ -1,32 +1,48 @@
-function initProfile() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+import ProfileService from '../../services/profile-service.js';
+import Constants from '../../utils/constants.js';
+
+window.initProfile = function () {
     const usernameElement = document.getElementById("profileUsername");
     const roleElement = document.getElementById("profileRole");
     const registeredElement = document.getElementById("profileRegistered");
-    const message = document.getElementById("profileMessage");
 
-    if (!user) {
-        document.getElementById("profileInfo").innerHTML = "<p>No user logged in!</p>";
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    if (!userData || !userData.id) {
+        document.getElementById("profileInfo").innerHTML = "<p>No user logged in or user ID not found.</p>";
         return;
     }
 
-    usernameElement.textContent = user.username;
-    roleElement.textContent = user.role;
-    registeredElement.textContent = user.registered || "Unknown";
+    // Fetch user data from the backend using ProfileService
+    ProfileService.getProfile(userData.id,
+        function(user) {
+            console.log("ProfileService: raw user data received:", user);
+            if (user) { // Backend now returns user object directly
+                usernameElement.textContent = user.username || 'N/A';
+                roleElement.textContent = user.role || 'N/A';
+                registeredElement.textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
 
-    if (user.role === "admin") {
-        document.getElementById("adminStats").style.display = "block";
-        document.getElementById("totalCars").textContent = (JSON.parse(localStorage.getItem("cars")) || []).length;
-        document.getElementById("totalReviews").textContent = (JSON.parse(localStorage.getItem("reviews")) || []).length;
-        document.getElementById("totalMeetups").textContent = (JSON.parse(localStorage.getItem("meetups")) || []).length;
-        document.getElementById("deleteAccountBtn").style.display = "none";
-    }
+            } else {
+                document.getElementById("profileInfo").innerHTML = "<p>Failed to load user profile.</p>";
+            }
+        },
+        function(xhr) {
+            console.error("Error fetching profile:", xhr.responseText);
+            document.getElementById("profileInfo").innerHTML = "<p>Error loading profile data.</p>";
+        }
+    );
 }
 
-function changePassword() {
+$(document).on("spapp:ready", function () {
+    if (window.location.hash === "#profile") {
+        initProfile();
+    }
+});
+
+window.changePassword = function () {
     const oldPassword = document.getElementById("oldPassword").value;
     const newPassword = document.getElementById("newPassword").value;
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    const userId = userData ? userData.id : null;
     const message = document.getElementById("profileMessage");
 
     if (!oldPassword || !newPassword) {
@@ -35,32 +51,78 @@ function changePassword() {
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const foundUser = users.find(u => u.username === user.username);
-
-    if (foundUser && foundUser.password === oldPassword) {
-        foundUser.password = newPassword;
-        localStorage.setItem("users", JSON.stringify(users));
-        message.textContent = "Password updated successfully!";
-        message.style.color = "green";
-    } else {
-        message.textContent = "Old password is incorrect!";
+    if (!userId) {
+        message.textContent = "User not logged in.";
         message.style.color = "darkred";
+        return;
     }
+
+    $.ajax({
+        url: Constants.PROJECT_BASE_URL + 'users/' + userId + '/password',
+        type: 'PUT',
+        headers: { 'Authorization': localStorage.getItem('user_token') },
+        data: JSON.stringify({
+            old_password: oldPassword,
+            new_password: newPassword
+        }),
+        contentType: 'application/json',
+        success: function(result) {
+            if (result && result.success) {
+                message.textContent = "Password updated successfully!";
+                message.style.color = "green";
+                document.getElementById("oldPassword").value = '';
+                document.getElementById("newPassword").value = '';
+            } else {
+                message.textContent = result.message || "Failed to change password!";
+                message.style.color = "darkred";
+            }
+        },
+        error: function(xhr) {
+            // Safely access the error message
+            const errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : xhr.responseText;
+            message.textContent = "Error: " + errorMessage;
+            message.style.color = "darkred";
+        }
+    });
 }
-function logoutUser() {
-    localStorage.removeItem("loggedInUser");
+
+window.logoutUser = function () {
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_data");
     window.location.href = "pages/login.html";
 }
 
-function deleteAccount() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    let users = JSON.parse(localStorage.getItem("users")) || [];
+window.deleteAccount = function () {
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    const userId = userData ? userData.id : null;
 
-    users = users.filter(u => u.username !== user.username);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.removeItem("loggedInUser");
+    if (!userId) {
+        alert("User not logged in.");
+        return;
+    }
 
-    alert("Account deleted successfully!");
-    window.location.href = "index.html";
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+        return;
+    }
+
+    $.ajax({
+        url: Constants.PROJECT_BASE_URL + 'users/' + userId,
+        type: 'DELETE',
+        headers: { 'Authorization': localStorage.getItem('user_token') },
+        success: function(result) {
+            if (result && result.success) {
+                alert("Account deleted successfully!");
+                localStorage.removeItem("user_token");
+                localStorage.removeItem("user_data");
+                window.location.href = "index.html";
+            } else {
+                alert(result.message || "Failed to delete account!");
+            }
+        },
+        error: function(xhr) {
+            // Safely access the error message
+            const errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : xhr.responseText;
+            alert("Error: " + errorMessage);
+        }
+    });
 }

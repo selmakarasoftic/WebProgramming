@@ -25,7 +25,7 @@ class UserDao extends BaseDao {
 
     // get one - samo određena polja, pa ostaje
     public function getUserById($id) {
-        $stmt = $this->connection->prepare("SELECT id, username, email, role, created_at FROM users WHERE id = :id");
+        $stmt = $this->connection->prepare("SELECT id, username, email, role, created_at, password FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id);
         $stmt->execute();
         return $stmt->fetch();
@@ -36,7 +36,7 @@ class UserDao extends BaseDao {
         $data['id'] = $id;
         $stmt = $this->connection->prepare("
             UPDATE users 
-            SET username = :username, email = :email
+            SET username = :username, email = :email, role = :role
             WHERE id = :id
         ");
         $stmt->execute($data);

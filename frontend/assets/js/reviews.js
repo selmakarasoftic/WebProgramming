@@ -1,143 +1,216 @@
-const defaultReviews = [
-    {
-        title: "Audi RS7 Review",
-        name: "Selma",
-        content: "Amazing performance and sleek design. Handles like a dream!",
-        rating: 5,
-        images: [
-            "assets/images/audi.jpg",
-            "assets/images/audi2.jpg",
-            "assets/images/audi3.jpg"
-        ]
-    }
-];
-
-// Load reviews from localStorage or use default ones
-const reviews = JSON.parse(localStorage.getItem("reviews")) || defaultReviews;
+import ReviewService from '../../services/review-service.js';
 
 window.initReviews = function () {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-
-    const form = document.getElementById("addReviewForm");
-    if (form && user && user.role !== "admin") {
-        form.style.display = "none";
-    }
-
-    renderReviews();
+    fetchAndRenderReviews();
+    showOrHideReviewForm();
 }
 
-function renderReviews() {
+function fetchAndRenderReviews() {
+    ReviewService.getAllReviews(
+        function(result) {
+            if (Array.isArray(result)) {
+                renderReviews(result);
+            } else if (result && result.data && Array.isArray(result.data)) {
+                renderReviews(result.data);
+            } else {
+                console.error("Invalid response format:", result);
+                alert("Failed to fetch reviews: Invalid response format");
+            }
+        },
+        function(xhr) {
+            console.error("Failed to fetch reviews:", xhr.responseText);
+            alert("Failed to fetch reviews: " + xhr.responseText);
+        }
+    );
+}
+
+function renderReviews(reviews) {
     const container = document.getElementById("reviewsContainer");
     if (!container) return;
-
     container.innerHTML = "";
-
-    reviews.forEach((review, index) => {
+    reviews.forEach((review) => {
         const card = document.createElement("div");
         card.classList.add("review-card");
-
-        const galleryDiv = document.createElement("div");
-        galleryDiv.classList.add("image-gallery");
-
-        review.images.forEach((imgSrc, idx) => {
-            const img = document.createElement("img");
-            img.src = imgSrc;
-            if (idx === 0) img.classList.add("active");
-            galleryDiv.appendChild(img);
-        });
-
-        const prevBtn = document.createElement("button");
-        prevBtn.classList.add("prev");
-        prevBtn.innerHTML = "&#10094;";
-        prevBtn.onclick = () => prevImage(galleryDiv);
-
-        const nextBtn = document.createElement("button");
-        nextBtn.classList.add("next");
-        nextBtn.innerHTML = "&#10095;";
-        nextBtn.onclick = () => nextImage(galleryDiv);
-
-        galleryDiv.appendChild(prevBtn);
-        galleryDiv.appendChild(nextBtn);
-
         card.innerHTML = `
             <h3>${review.title}</h3>
-            <p><strong>Reviewer:</strong> ${review.name}</p>
-            <p>${review.content}</p>
+            <p><strong>Reviewer:</strong> ${review.reviewer_name || 'Unknown'}</p>
+            <p>${review.review_text}</p>
             <p><strong>Rating:</strong> ${'⭐'.repeat(review.rating)}</p>
         `;
 
-        const user = JSON.parse(localStorage.getItem("loggedInUser"));
-        if (user && user.role === "admin") {
+        const userData = localStorage.getItem("user_data");
+        const user = userData ? JSON.parse(userData) : null;
+
+        if (user && (user.role === "admin" || user.id === review.user_id)) {
+            const buttonContainer = document.createElement("div");
+            buttonContainer.classList.add("review-buttons");
+
+            if (user.id === review.user_id) { // Only show edit for the user's own reviews
+                const editBtn = document.createElement("button");
+                editBtn.classList.add("edit-btn-review");
+                editBtn.textContent = "✏️ Edit";
+                editBtn.onclick = () => showEditReviewForm(review);
+                buttonContainer.appendChild(editBtn);
+            }
+
             const deleteBtn = document.createElement("button");
             deleteBtn.classList.add("delete-btn-review");
             deleteBtn.textContent = "🗑️ Delete";
-            deleteBtn.onclick = () => {
-                reviews.splice(index, 1);
-                localStorage.setItem("reviews", JSON.stringify(reviews));
-                renderReviews();
-            };
-            card.appendChild(deleteBtn);
+            deleteBtn.onclick = () => deleteReview(review.id);
+            buttonContainer.appendChild(deleteBtn);
+
+            card.appendChild(buttonContainer);
         }
 
-        card.insertBefore(galleryDiv, card.firstChild);
         container.appendChild(card);
     });
 }
 
-function prevImage(gallery) {
-    const images = gallery.querySelectorAll("img");
-    const activeImage = gallery.querySelector("img.active");
-    let currentIndex = Array.from(images).indexOf(activeImage);
-
-    activeImage.classList.remove("active");
-    currentIndex = (currentIndex - 1 + images.length) % images.length;
-    images[currentIndex].classList.add("active");
+function showOrHideReviewForm() {
+    const form = document.querySelector(".add-review");
+    const userData = localStorage.getItem("user_data");
+    const user = userData ? JSON.parse(userData) : null;
+    if (form && user && (user.role === "admin" || user.role === "guest")) {
+        form.style.display = "block";
+    } else if (form) {
+        form.style.display = "none";
+    }
 }
 
-function nextImage(gallery) {
-    const images = gallery.querySelectorAll("img");
-    const activeImage = gallery.querySelector("img.active");
-    let currentIndex = Array.from(images).indexOf(activeImage);
-
-    activeImage.classList.remove("active");
-    currentIndex = (currentIndex + 1) % images.length;
-    images[currentIndex].classList.add("active");
-}
-
-function toBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-window.addReview = async function () {
-    const name = document.getElementById("reviewerName").value;
+window.addReview = function () {
     const title = document.getElementById("reviewTitle").value;
     const content = document.getElementById("reviewContent").value;
     const rating = document.getElementById("reviewRating").value;
-    const imageInput = document.getElementById("reviewImages");
+    // Removed imageInput
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    const userId = userData.id;
+    const reviewerName = userData.username;
 
-    if (!name || !title || !content || imageInput.files.length === 0) {
-        alert("Please fill out all fields and upload at least one image!");
+    if (!title || !content) { // Removed image validation
+        alert("Please fill out all fields!");
         return;
     }
 
-    const images = await Promise.all(
-        Array.from(imageInput.files).map(file => toBase64(file))
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("title", title);
+    formData.append("review_text", content);
+    formData.append("rating", rating);
+    // Removed formData.append("image", ...)
+    formData.append("reviewer_name", reviewerName);
+    formData.append("car_id", null); // Ensure car_id is explicitly null
+
+    fetch("/SelmaKarasoftic/WebProgramming/backend/reviews", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "Authorization": localStorage.getItem("user_token")
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Review added successfully!");
+            fetchAndRenderReviews();
+            document.getElementById('reviewTitle').value = '';
+            document.getElementById('reviewContent').value = '';
+            document.getElementById('reviewRating').value = '5';
+            // Removed image input clear
+        } else {
+            alert("Failed to add review: " + (data.message || "Unknown error"));
+        }
+    })
+    .catch(error => {
+        alert("Failed to add review: " + error);
+    });
+}
+
+function showEditReviewForm(review) {
+    const modal = document.createElement("div");
+    modal.classList.add("modal-overlay");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Edit Review</h3>
+            <form id="editReviewForm">
+                <input type="text" id="editReviewTitle" placeholder="Review Title" value="${review.title}" required>
+                <textarea id="editReviewContent" placeholder="Your Review" required>${review.review_text}</textarea>
+                <select id="editReviewRating" required>
+                    <option value="5" ${review.rating == 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐</option>
+                    <option value="4" ${review.rating == 4 ? 'selected' : ''}>⭐⭐⭐⭐☆</option>
+                    <option value="3" ${review.rating == 3 ? 'selected' : ''}>⭐⭐⭐☆☆</option>
+                    <option value="2" ${review.rating == 2 ? 'selected' : ''}>⭐⭐☆☆☆</option>
+                    <option value="1" ${review.rating == 1 ? 'selected' : ''}>⭐☆☆☆☆</option>
+                </select>
+                <div class="modal-buttons">
+                    <button type="submit">Save Changes</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById("editReviewForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        updateReview(review.id);
+    });
+}
+
+function closeModal() {
+    const modal = document.querySelector(".modal-overlay");
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function updateReview(reviewId) {
+    const title = document.getElementById("editReviewTitle").value;
+    const content = document.getElementById("editReviewContent").value;
+    const rating = document.getElementById("editReviewRating").value;
+
+    if (!title || !content) {
+        alert("Please fill all required fields!");
+        return;
+    }
+
+    const reviewData = {
+        title: title,
+        review_text: content,
+        rating: parseInt(rating)
+    };
+
+    ReviewService.updateReview(reviewId, reviewData,
+        function(result) {
+            if (result && result.success) {
+                alert("Review updated successfully!");
+                closeModal();
+                fetchAndRenderReviews();
+            } else {
+                alert("Failed to update review: " + (result.message || "Unknown error"));
+            }
+        },
+        function(xhr) {
+            alert("Failed to update review: " + xhr.responseText);
+        }
     );
+}
 
-    reviews.push({ name, title, content, rating, images });
-    localStorage.setItem("reviews", JSON.stringify(reviews));
-    renderReviews();
+function deleteReview(id) {
+    if (!confirm("Are you sure you want to delete this review?")) return;
 
-    document.getElementById('reviewerName').value = '';
-    document.getElementById('reviewTitle').value = '';
-    document.getElementById('reviewContent').value = '';
-    document.getElementById('reviewRating').value = '5';
-    document.getElementById('reviewImages').value = '';
+    ReviewService.deleteReview(id,
+        function(result) {
+            if (result && result.success) {
+                fetchAndRenderReviews();
+                alert("Review deleted successfully!");
+            } else {
+                alert("Failed to delete review: " + (result.message || "Unknown error"));
+            }
+        },
+        function(xhr) {
+            alert("Failed to delete review: " + xhr.responseText);
+        }
+    );
 }
 
 $(document).on("spapp:ready", function () {

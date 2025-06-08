@@ -36,7 +36,8 @@ class CarService extends BaseService {
 
     // update - može preko BaseService::update()
     public function updateCar($id, $data) {
-        return $this->update($id, $data); // koristi BaseService::update()
+        // Ensure $id is an integer for database operations
+        return $this->update((int)$id, $data); // koristi BaseService::update()
     }
 
     // delete - može preko BaseService::delete()
@@ -53,6 +54,10 @@ class CarService extends BaseService {
     // samo svoja dodana ako hoce al to moram na frontu dpdat
     public function countCarsByUser($user_id) {
         return $this->dao->countCarsByUser($user_id);
+    }
+
+    public function getLatestCar() {
+        return $this->dao->getLatestCar();
     }
 }
 ?>
