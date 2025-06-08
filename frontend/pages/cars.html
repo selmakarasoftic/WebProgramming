@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cars - AutoVerse</title>
+    <link rel="stylesheet" href="assets/css/cars.css">
+</head>
+<body>
+    <h2>🚗 Explore Cars</h2>
+    <p>Check out the latest cars shared by our community.</p>
+    
+    <div class="cars-container" id="carsContainer">
+        <!-- Cars will be dynamically loaded here -->
+    </div>
+    
+    <div class="add-car">
+        <h3>➕ Add a New Car</h3>
+        <input type="text" id="carModel" placeholder="Car Model" required>
+        <input type="number" id="carYear" placeholder="Year" min="1886" max="2024" required>
+        <input type="text" id="engine" placeholder="Engine (e.g., 2.0L VTEC)" required>
+        <input type="number" id="horsepower" placeholder="Horsepower" min="1" required>
+        <input type="file" id="carImages" accept="image/*" required>
+        <button onclick="addNewCar()">Add Car</button>
+    </div>
+
+    <script type="module" src="../assets/js/cars.js"></script>
+</body>
+</html>
