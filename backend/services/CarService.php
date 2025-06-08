@@ -55,5 +55,9 @@ class CarService extends BaseService {
     public function countCarsByUser($user_id) {
         return $this->dao->countCarsByUser($user_id);
     }
+
+    public function getLatestCar() {
+        return $this->dao->getLatestCar();
+    }
 }
 ?>

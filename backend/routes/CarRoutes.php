@@ -20,6 +20,20 @@ Flight::route('GET /cars', function () {
 
 /**
  * @OA\Get(
+ *     path="/cars/latest",
+ *     summary="Get the latest added car",
+ *     security={{"ApiKey": {}}},
+ *     tags={"Cars"},
+ *     @OA\Response(response=200, description="Latest car details")
+ * )
+ */
+Flight::route('GET /cars/latest', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+    Flight::json(Flight::carService()->getLatestCar());
+});
+
+/**
+ * @OA\Get(
  *     path="/cars/{id}",
  *     summary="Get a car by ID",
  *     security={{"ApiKey": {}}},

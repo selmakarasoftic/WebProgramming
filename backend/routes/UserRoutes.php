@@ -142,6 +142,33 @@ Flight::route('PUT /users/@id/password', function ($id) {
 });
 
 /**
+ * @OA\Put(
+ *     path="/users/{id}",
+ *     summary="Update a user",
+ *     tags={"Users"},
+ *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="username", type="string"),
+ *             @OA\Property(property="email", type="string")
+ *         )
+ *     ),
+ *     @OA\Response(response=200, description="User updated")
+ * )
+ */
+Flight::route('PUT /users/@id', function ($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN]);
+    $data = Flight::request()->data->getData();
+    $rows = Flight::userService()->updateUser($id, $data);
+
+    Flight::json([
+        "success" => $rows > 0,
+        "message" => $rows > 0 ? "User updated successfully" : "No user updated"
+    ]);
+});
+
+/**
  * @OA\Delete(
  *     path="/users/{id}",
  *     summary="Delete a user",
@@ -152,7 +179,7 @@ Flight::route('PUT /users/@id/password', function ($id) {
  * )
  */
 Flight::route('DELETE /users/@id', function ($id) {
-    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
 
     $logged_in_user = Flight::get('user');
     if ($logged_in_user->id != $id && $logged_in_user->role !== Roles::ADMIN) {

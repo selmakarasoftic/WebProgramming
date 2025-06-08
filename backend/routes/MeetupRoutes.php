@@ -19,6 +19,20 @@ Flight::route('GET /meetups', function () {
 
 /**
  * @OA\Get(
+ *     path="/meetups/latest",
+ *     summary="Get the latest added meetup",
+ *     security={{"ApiKey": {}}},
+ *     tags={"Meetups"},
+ *     @OA\Response(response=200, description="Latest meetup details")
+ * )
+ */
+Flight::route('GET /meetups/latest', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+    Flight::json(Flight::meetupService()->getLatestMeetup());
+});
+
+/**
+ * @OA\Get(
  *     path="/meetups/{id}",
  *     summary="Get a meetup by ID",
  *     security={{"ApiKey": {}}},

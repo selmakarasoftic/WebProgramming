@@ -66,5 +66,25 @@ class CarDao extends BaseDao {
     }
 
     //  addCar, updateCar, deleteCar are done through BaseDao
+
+    public function getLatestCar() {
+        $stmt = $this->connection->prepare("
+            SELECT 
+                c.id,
+                c.model,
+                c.year,
+                c.engine,
+                c.horsepower,
+                c.image_url,
+                u.username AS uploader,
+                u.id AS user_id
+            FROM cars c
+            JOIN users u ON c.user_id = u.id
+            ORDER BY c.id DESC
+            LIMIT 1
+        ");
+        $stmt->execute();
+        return $stmt->fetch();
+    }
 }
 ?>

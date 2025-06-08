@@ -58,6 +58,15 @@ const CarService = {
             success,
             error
         });
+    },
+    getLatestCar: function(success, error) {
+        $.ajax({
+            url: Constants.PROJECT_BASE_URL + 'cars/latest',
+            type: 'GET',
+            headers: { 'Authorization': localStorage.getItem('user_token') },
+            success,
+            error
+        });
     }
 };
 

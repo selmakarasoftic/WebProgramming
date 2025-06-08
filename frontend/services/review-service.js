@@ -49,6 +49,15 @@ const ReviewService = {
             success,
             error
         });
+    },
+    getLatestReview: function(success, error) {
+        $.ajax({
+            url: Constants.PROJECT_BASE_URL + 'reviews/latest',
+            type: 'GET',
+            headers: { 'Authorization': localStorage.getItem('user_token') },
+            success,
+            error
+        });
     }
 };
 

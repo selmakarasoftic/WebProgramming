@@ -49,6 +49,15 @@ const MeetupService = {
             success,
             error
         });
+    },
+    getLatestMeetup: function(success, error) {
+        $.ajax({
+            url: Constants.PROJECT_BASE_URL + 'meetups/latest',
+            type: 'GET',
+            headers: { 'Authorization': localStorage.getItem('user_token') },
+            success,
+            error
+        });
     }
 };
 

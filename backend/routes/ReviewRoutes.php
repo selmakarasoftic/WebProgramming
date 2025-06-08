@@ -16,6 +16,20 @@ Flight::route('GET /reviews', function() {
 
 /**
  * @OA\Get(
+ *     path="/reviews/latest",
+ *     summary="Get the latest added review",
+ *     security={{"ApiKey": {}}},
+ *     tags={"Reviews"},
+ *     @OA\Response(response=200, description="Latest review details")
+ * )
+ */
+Flight::route('GET /reviews/latest', function () {
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+    Flight::json(Flight::reviewService()->getLatestReview());
+});
+
+/**
+ * @OA\Get(
  *     path="/reviews/{id}",
  *     summary="Get a review by ID",
  *     security={{"ApiKey": {}}},

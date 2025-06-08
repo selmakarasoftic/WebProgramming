@@ -1,4 +1,14 @@
-import UserService from '../../services/user-service.js';
+$(document).ready(function() {
+    if (window.location.hash === "#users") {
+        initAdminPage();
+    }
+});
+
+$(document).on("spapp:ready", function () {
+    if (window.location.hash === "#users") {
+        initAdminPage();
+    }
+});
 
 function initAdminPage() {
     const userListContainer = document.getElementById("userList");
@@ -22,7 +32,7 @@ function initAdminPage() {
         return;
     }
 
-    fetchAndRenderUsers(); // Call the function to fetch and render users
+    fetchAndRenderUsers();
 }
 
 function fetchAndRenderUsers() {
@@ -33,7 +43,7 @@ function fetchAndRenderUsers() {
 
     UserService.getAllUsers(
         function(result) {
-            console.log("UserService.getAllUsers raw response:", result); // Log raw response
+            console.log("UserService.getAllUsers raw response:", result);
             let usersToRender = [];
 
             if (result && result.data && Array.isArray(result.data)) {
@@ -60,8 +70,8 @@ function fetchAndRenderUsers() {
                             <p><strong>Registered:</strong> ${user.created_at ? new Date(user.created_at).toLocaleDateString() : "Unknown"}</p>
                         </div>
                         <div class="user-actions">
-                            <button class="edit-btn-user" onclick="window.editUser('${user.id}', '${user.username}', '${user.email}', '${user.role}')">✏️ Edit</button>
-                            ${user.role !== "admin" ? `<button class="delete-btn-user" onclick="window.deleteUser('${user.id}')">🗑️ Delete</button>` : ""}
+                            <button class="edit-btn-user" onclick="editUser('${user.id}', '${user.username}', '${user.email}', '${user.role}')">✏️ Edit</button>
+                            ${user.role !== "admin" ? `<button class="delete-btn-user" onclick="deleteUser('${user.id}')">🗑️ Delete</button>` : ""}
                         </div>
                     `;
 
@@ -79,8 +89,7 @@ function fetchAndRenderUsers() {
     );
 }
 
-// Make functions global for onclick events
-window.editUser = function (id, username, email, role) {
+function editUser(id, username, email, role) {
     const newRole = prompt(`Change role for ${username} (admin/guest):`, role);
     if (newRole && (newRole === "admin" || newRole === "guest")) {
         const updatedUser = { username: username, email: email, role: newRole };
@@ -93,7 +102,7 @@ window.editUser = function (id, username, email, role) {
             success: function(result) {
                 if (result && result.success) {
                     alert("User updated successfully!");
-                    fetchAndRenderUsers(); // Re-render the list
+                    fetchAndRenderUsers();
                 } else {
                     alert(result.message || "Failed to update user!");
                 }
@@ -105,9 +114,9 @@ window.editUser = function (id, username, email, role) {
     } else if (newRole !== null) {
         alert("❌ Invalid role. Use 'admin' or 'guest'.");
     }
-};
+}
 
-window.deleteUser = function (id) {
+function deleteUser(id) {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     $.ajax({
@@ -117,7 +126,7 @@ window.deleteUser = function (id) {
         success: function(result) {
             if (result && result.success) {
                 alert("User deleted successfully!");
-                fetchAndRenderUsers(); // Re-render the list
+                fetchAndRenderUsers();
             } else {
                 alert(result.message || "Failed to delete user!");
             }
@@ -126,5 +135,4 @@ window.deleteUser = function (id) {
             alert("Error: " + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : xhr.responseText));
         }
     });
-};
-
+}

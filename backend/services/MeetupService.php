@@ -56,5 +56,9 @@ class MeetupService extends BaseService {
     public function countMeetupsByUser($user_id) {
         return $this->dao->countMeetupsByUser($user_id);
     }
+
+    public function getLatestMeetup() {
+        return $this->dao->getLatestMeetup();
+    }
 }
 ?>

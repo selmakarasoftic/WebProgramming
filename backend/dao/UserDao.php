@@ -36,7 +36,7 @@ class UserDao extends BaseDao {
         $data['id'] = $id;
         $stmt = $this->connection->prepare("
             UPDATE users 
-            SET username = :username, email = :email
+            SET username = :username, email = :email, role = :role
             WHERE id = :id
         ");
         $stmt->execute($data);
