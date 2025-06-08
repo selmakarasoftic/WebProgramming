@@ -1,10 +1,10 @@
 <?php
 
 // Set CORS headers at the very beginning to ensure they are sent before any output
+// cors.php
 $allowedOrigins = [
-    "http://127.0.0.1:5501",
-   "https://seahorse-app-pf2x9.ondigitalocean.app",
-   "https://king-prawn-app-vy3pu.ondigitalocean.app"
+    "https://king-prawn-app-vy3pu.ondigitalocean.app",
+    "http://127.0.0.1:5501"
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(204);
     exit();
 }
+
 
 require __DIR__ . '/vendor/autoload.php';
 
