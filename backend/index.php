@@ -5,6 +5,8 @@
 $allowedOrigins = [
     "https://king-prawn-app-vy3pu.ondigitalocean.app/",
     "https://king-prawn-app-vy3pu.ondigitalocean.app",
+    "https://seahorse-app-pf2x9.ondigitalocean.app",
+    "https://seahorse-app-pf2x9.ondigitalocean.app/",
     "http://127.0.0.1:5501"
 ];
 
