@@ -21,7 +21,7 @@ class ReviewDao extends BaseDao {
                 c.image_url AS car_image
             FROM reviews r
             JOIN users u ON r.user_id = u.id
-            JOIN cars c ON r.car_id = c.id
+            LEFT JOIN cars c ON r.car_id = c.id
         ");
         $stmt->execute();
         return $stmt->fetchAll();
@@ -42,7 +42,7 @@ class ReviewDao extends BaseDao {
                 c.image_url AS car_image
             FROM reviews r
             JOIN users u ON r.user_id = u.id
-            JOIN cars c ON r.car_id = c.id
+            LEFT JOIN cars c ON r.car_id = c.id
             WHERE r.id = :id
         ");
         $stmt->bindParam(':id', $id);

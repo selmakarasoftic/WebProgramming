@@ -1,109 +1,222 @@
-document.addEventListener("DOMContentLoaded", function () {
-    if (!document.getElementById("galleryContainer")) {
-        return; 
+import GalleryService from '../../services/gallery-service.js';
+
+$(document).on("spapp:ready", function () {
+    if (window.location.hash === "#gallery") {
+        initGallery();
     }
-    
-    initGallery();
 });
 
-const galleryKey = "galleryPhotos"; 
-
-function initGallery() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+window.initGallery = function () {
+    console.log("initGallery called.");
+    const user = JSON.parse(localStorage.getItem("user_data"));
     const uploadSection = document.getElementById("uploadSection");
 
-    if (!uploadSection) return; 
+    if (uploadSection) {
+        if (user) {
+            uploadSection.style.display = "block";
+        } else {
+            uploadSection.style.display = "none";
+        }
+    }
+    fetchAndRenderGallery();
+}
 
-    if (!user) {
-        uploadSection.style.display = "none";
+function fetchAndRenderGallery() {
+    console.log("Fetching and rendering gallery...");
+    GalleryService.getAllGalleryItems(
+        function(result) {
+            console.log("getAllGalleryItems Result:", result);
+            if (Array.isArray(result)) {
+                renderGallery(result);
+            } else if (result && result.data && Array.isArray(result.data)) {
+                renderGallery(result.data);
+            } else {
+                console.error("Invalid response format:", result);
+                alert("Failed to fetch gallery items: Invalid response format");
+            }
+        },
+        function(xhr) {
+            console.error("Failed to fetch gallery items:", xhr.responseText);
+            alert("Failed to fetch gallery items: " + xhr.responseText);
+        }
+    );
+}
+
+function renderGallery(photos) {
+    console.log("Rendering gallery with photos:", photos);
+    const galleryContainer = document.getElementById("galleryContainer");
+    if (!galleryContainer) {
+        console.warn("galleryContainer not found.");
+        return;
     }
 
-    renderGallery();
-}
+    // Clear existing content more robustly
+    while (galleryContainer.firstChild) {
+        galleryContainer.removeChild(galleryContainer.firstChild);
+    }
 
-function getGalleryPhotos() {
-    return JSON.parse(localStorage.getItem(galleryKey)) || [];
-}
-
-function renderGallery() {
-    const galleryContainer = document.getElementById("galleryContainer");
-    if (!galleryContainer) return; 
-
-    galleryContainer.innerHTML = "";
-
-    const photos = getGalleryPhotos();
-
-    if (photos.length === 0) {
+    if (!Array.isArray(photos) || photos.length === 0) {
         galleryContainer.innerHTML = "<p>No photos in the gallery yet.</p>";
         return;
     }
 
-    photos.forEach((photo, index) => {
+    const userData = localStorage.getItem("user_data");
+    const user = userData ? JSON.parse(userData) : null;
+
+    photos.forEach((photo) => {
         const photoCard = document.createElement("div");
         photoCard.classList.add("photo-card");
 
         photoCard.innerHTML = `
-            <img src="${photo.imageUrl}" alt="${photo.title}">
+            <img src="${photo.image_url}" alt="${photo.title}">
             <h4>${photo.title}</h4>
-            <p>Uploaded by: ${photo.uploadedBy} | ${photo.timestamp}</p>
-            ${isAdmin() ? `<button class="delete-btn-gallery" onclick="deletePhoto(${index})">🗑️ Delete</button>` : ""}
+            <p>Uploaded by: ${photo.uploaded_by_name || 'Unknown'} | ${new Date(photo.uploaded_at).toLocaleString()}</p>
         `;
+
+        if (user && user.role === "admin") {
+            const buttonContainer = document.createElement("div");
+            buttonContainer.classList.add("gallery-buttons");
+
+            const editBtn = document.createElement("button");
+            editBtn.classList.add("edit-btn-gallery");
+            editBtn.textContent = "✏️ Edit";
+            editBtn.onclick = () => showEditGalleryForm(photo);
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.classList.add("delete-btn-gallery");
+            deleteBtn.textContent = "🗑️ Delete";
+            deleteBtn.onclick = () => deletePhoto(photo.id);
+
+            buttonContainer.appendChild(editBtn);
+            buttonContainer.appendChild(deleteBtn);
+            photoCard.appendChild(buttonContainer);
+        }
 
         galleryContainer.appendChild(photoCard);
     });
 }
 
-function uploadPhoto() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (!user) {
-        alert("You must be logged in to upload a photo!");
+window.uploadPhoto = function () {
+    const userData = JSON.parse(localStorage.getItem("user_data"));
+    if (!userData) {
+        alert("You must be logged in to upload photos!");
         return;
     }
 
     const title = document.getElementById("photoTitle").value;
-    const file = document.getElementById("photoUpload").files[0];
+    const fileInput = document.getElementById("photoUpload");
+    const file = fileInput.files[0];
+    const userId = userData.id;
 
     if (!title || !file) {
         alert("Please enter a title and select an image.");
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        const newPhoto = {
-            title,
-            imageUrl: event.target.result,
-            uploadedBy: user.username,
-            timestamp: new Date().toLocaleString()
-        };
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("title", title);
+    formData.append("image", file);
 
-        const photos = getGalleryPhotos();
-        photos.push(newPhoto);
-        localStorage.setItem(galleryKey, JSON.stringify(photos));
+    GalleryService.addGalleryItem(formData,
+        function(result) {
+            console.log("Add Gallery Item Success:", result);
+            if (result && result.success) {
+                alert("Photo uploaded successfully!");
+                fetchAndRenderGallery();
+                document.getElementById("photoTitle").value = "";
+                fileInput.value = ""; // Clear the file input
+            } else {
+                alert("Failed to upload photo: " + (result.message || "Unknown error"));
+            }
+        },
+        function(xhr) {
+            console.error("Add Gallery Item Error:", xhr.responseText);
+            alert("Failed to upload photo: " + xhr.responseText);
+        }
+    );
+};
 
-        renderGallery();
-    };
+function showEditGalleryForm(photo) {
+    const modal = document.createElement("div");
+    modal.classList.add("modal-overlay");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Edit Gallery Item</h3>
+            <form id="editGalleryForm">
+                <input type="text" id="editGalleryTitle" placeholder="Title" value="${photo.title}" required>
+                <input type="file" id="editGalleryImage" accept="image/*">
+                <div class="modal-buttons">
+                    <button type="submit">Save Changes</button>
+                    <button type="button" id="cancelEditGallery">Cancel</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
 
-    reader.readAsDataURL(file);
+    document.getElementById("editGalleryForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        updateGalleryItem(photo.id);
+    });
 
-    document.getElementById("photoTitle").value = "";
-    document.getElementById("photoUpload").value = "";
+    document.getElementById("cancelEditGallery").addEventListener("click", function() {
+        closeModal();
+    });
 }
 
-function deletePhoto(index) {
-    if (!isAdmin()) return;
-
-    const confirmDelete = confirm("Are you sure you want to delete this photo?");
-    if (!confirmDelete) return;
-
-    const photos = getGalleryPhotos();
-    photos.splice(index, 1);
-    localStorage.setItem(galleryKey, JSON.stringify(photos));
-
-    renderGallery();
+function closeModal() {
+    const modal = document.querySelector(".modal-overlay");
+    if (modal) {
+        modal.remove();
+    }
 }
 
-function isAdmin() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    return user && user.role === "admin";
+function updateGalleryItem(galleryId) {
+    const title = document.getElementById("editGalleryTitle").value;
+    const imageInput = document.getElementById("editGalleryImage");
+
+    if (!title) {
+        alert("Please fill all required fields!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    if (imageInput.files.length > 0) {
+        formData.append("image", imageInput.files[0]);
+    }
+
+    GalleryService.updateGalleryItem(galleryId, formData,
+        function(result) {
+            if (result && result.success) {
+                alert("Gallery item updated successfully!");
+                closeModal();
+                fetchAndRenderGallery();
+            } else {
+                alert("Failed to update gallery item: " + (result.message || "Unknown error"));
+            }
+        },
+        function(xhr) {
+            alert("Failed to update gallery item: " + xhr.responseText);
+        }
+    );
 }
+
+window.deletePhoto = function (id) {
+    if (!confirm("Are you sure you want to delete this photo?")) return;
+
+    GalleryService.deleteGalleryItem(id,
+        function(result) {
+            if (result && result.success) {
+                alert("Photo deleted successfully!");
+                fetchAndRenderGallery();
+            } else {
+                alert("Failed to delete photo: " + (result.message || "Unknown error"));
+            }
+        },
+        function(xhr) {
+            alert("Failed to delete photo: " + xhr.responseText);
+        }
+    );
+};

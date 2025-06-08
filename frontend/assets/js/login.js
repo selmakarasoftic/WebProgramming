@@ -34,4 +34,15 @@ $(document).ready(function() {
             return false; // Prevent form from submitting normally
         }
     });
+
+    if (window.location.hash === "#cars") {
+        initCars();
+    }
 });
+
+window.addEventListener('hashchange', function() {
+    if (window.location.hash === "#cars") {
+        initCars();
+    }
+});
+

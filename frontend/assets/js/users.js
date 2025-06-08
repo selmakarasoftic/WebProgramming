@@ -1,93 +1,119 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Ensure the function only runs on the admin page
-    if (document.getElementById("adminPanel")) {
-        initAdminPage();
-    }
-});
+import UserService from '../../services/user-service.js';
 
 function initAdminPage() {
     const userListContainer = document.getElementById("userList");
-    const adminPanel = document.getElementById("adminPanel"); // Ensure this exists
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    const adminPanel = document.getElementById("adminPanel");
+    const userData = localStorage.getItem("user_data");
+    const loggedInUser = userData ? JSON.parse(userData) : null;
 
-    if (!adminPanel) return; // 
+    if (!adminPanel) return;
 
-    if (!loggedInUser || loggedInUser.role !== "admin") {
-        adminPanel.innerHTML = "<p>Unauthorized access.</p>";
+    // Check if user is logged in and is an admin
+    if (!loggedInUser) {
+        window.location.href = "login.html";
         return;
     }
 
-    renderUsers();
+    if (loggedInUser.role !== "admin") {
+        adminPanel.innerHTML = "<p>Unauthorized access. Redirecting to home page...</p>";
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 2000);
+        return;
+    }
+
+    fetchAndRenderUsers(); // Call the function to fetch and render users
 }
 
-function getUsers() {
-    return JSON.parse(localStorage.getItem("users")) || [];
-}
-
-function renderUsers() {
+function fetchAndRenderUsers() {
     const userListContainer = document.getElementById("userList");
     if (!userListContainer) return;
 
     userListContainer.innerHTML = ""; // Clear previous content
 
-    const users = getUsers();
+    UserService.getAllUsers(
+        function(users) {
+            if (Array.isArray(users) && users.length > 0) {
+                users.forEach((user) => {
+                    const userCard = document.createElement("div");
+                    userCard.classList.add("user-card");
 
-    if (users.length === 0) {
-        userListContainer.innerHTML = "<p>No users found.</p>";
-        return;
-    }
+                    userCard.innerHTML = `
+                        <div class="user-info">
+                            <h3>${user.username} <span class="role-badge ${user.role}">${user.role.toUpperCase()}</span></h3>
+                            <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
+                            <p><strong>Registered:</strong> ${user.created_at ? new Date(user.created_at).toLocaleDateString() : "Unknown"}</p>
+                        </div>
+                        <div class="user-actions">
+                            <button class="edit-btn-user" onclick="window.editUser('${user.id}', '${user.username}', '${user.email}', '${user.role}')">✏️ Edit</button>
+                            ${user.role !== "admin" ? `<button class="delete-btn-user" onclick="window.deleteUser('${user.id}')">🗑️ Delete</button>` : ""}
+                        </div>
+                    `;
 
-    users.forEach((user, index) => {
-        const userCard = document.createElement("div");
-        userCard.classList.add("user-card");
-
-        userCard.innerHTML = `
-            <div class="user-info">
-                <h3>${user.username} <span class="role-badge ${user.role}">${user.role.toUpperCase()}</span></h3>
-                <p><strong>Registered:</strong> ${user.registered || "Unknown"}</p>
-            </div>
-            <div class="user-actions">
-                <button class="edit-btn-user" onclick="editUser(${index})">✏️ Edit</button>
-                ${user.role !== "admin" ? `<button class="delete-btn-user" onclick="deleteUser(${index})">🗑️ Delete</button>` : ""}
-            </div>
-        `;
-
-        userListContainer.appendChild(userCard);
-    });
+                    userListContainer.appendChild(userCard);
+                });
+            } else {
+                userListContainer.innerHTML = "<p>No users found.</p>";
+            }
+        },
+        function(xhr) {
+            console.error("Error fetching users:", xhr.responseText);
+            userListContainer.innerHTML = "<p>Error loading users.</p>";
+        }
+    );
 }
 
-function editUser(index) {
-    const users = getUsers();
-    const newRole = prompt(`Change role for ${users[index].username} (admin/guest):`, users[index].role);
-
+// Make functions global for onclick events
+window.editUser = function (id, username, email, role) {
+    const newRole = prompt(`Change role for ${username} (admin/guest):`, role);
     if (newRole && (newRole === "admin" || newRole === "guest")) {
-        users[index].role = newRole;
-        localStorage.setItem("users", JSON.stringify(users));
-        renderUsers();
-    } else {
+        const updatedUser = { username: username, email: email, role: newRole };
+        $.ajax({
+            url: Constants.PROJECT_BASE_URL + 'users/' + id,
+            type: 'PUT',
+            headers: { 'Authorization': localStorage.getItem('user_token') },
+            data: JSON.stringify(updatedUser),
+            contentType: 'application/json',
+            success: function(result) {
+                if (result && result.success) {
+                    alert("User updated successfully!");
+                    fetchAndRenderUsers(); // Re-render the list
+                } else {
+                    alert(result.message || "Failed to update user!");
+                }
+            },
+            error: function(xhr) {
+                alert("Error: " + (xhr.responseJSON.message || xhr.responseText));
+            }
+        });
+    } else if (newRole !== null) {
         alert("❌ Invalid role. Use 'admin' or 'guest'.");
     }
-}
+};
 
-function deleteUser(index) {
-    const users = getUsers();
+window.deleteUser = function (id) {
+    if (!confirm("Are you sure you want to delete this user?")) return;
 
-    if (users[index].role === "admin") {
-        alert("❌ Cannot delete an admin account!");
-        return;
-    }
-
-    const confirmDelete = confirm(`Are you sure you want to delete ${users[index].username}?`);
-
-    if (confirmDelete) {
-        users.splice(index, 1);
-        localStorage.setItem("users", JSON.stringify(users));
-        renderUsers();
-    }
-}
+    $.ajax({
+        url: Constants.PROJECT_BASE_URL + 'users/' + id,
+        type: 'DELETE',
+        headers: { 'Authorization': localStorage.getItem('user_token') },
+        success: function(result) {
+            if (result && result.success) {
+                alert("User deleted successfully!");
+                fetchAndRenderUsers(); // Re-render the list
+            } else {
+                alert(result.message || "Failed to delete user!");
+            }
+        },
+        error: function(xhr) {
+            alert("Error: " + (xhr.responseJSON.message || xhr.responseText));
+        }
+    });
+};
 
 $(document).on("spapp:ready", function () {
     if (window.location.hash === "#users") {
-        renderUsers();
+        initAdminPage();
     }
 });

@@ -1,51 +1,49 @@
 import Constants from '../utils/constants.js';
 
-const GalleryService = {
-    getAllGalleryItems: function(success, error) {
+const MeetupService = {
+    getAllMeetups: function(success, error) {
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + 'gallery',
+            url: Constants.PROJECT_BASE_URL + 'meetups',
             type: 'GET',
             headers: { 'Authorization': localStorage.getItem('user_token') },
             success,
             error
         });
     },
-    getGalleryItemById: function(id, success, error) {
+    getMeetupById: function(id, success, error) {
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + 'gallery/' + id,
+            url: Constants.PROJECT_BASE_URL + 'meetups/' + id,
             type: 'GET',
             headers: { 'Authorization': localStorage.getItem('user_token') },
             success,
             error
         });
     },
-    addGalleryItem: function(galleryItem, success, error) {
+    addMeetup: function(meetup, success, error) {
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + 'gallery',
+            url: Constants.PROJECT_BASE_URL + 'meetups',
             type: 'POST',
             headers: { 'Authorization': localStorage.getItem('user_token') },
-            data: galleryItem,
-            processData: false,
-            contentType: false,
+            data: JSON.stringify(meetup),
+            contentType: 'application/json',
             success,
             error
         });
     },
-    updateGalleryItem: function(id, galleryItem, success, error) {
+    updateMeetup: function(id, meetup, success, error) {
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + 'gallery/' + id,
+            url: Constants.PROJECT_BASE_URL + 'meetups/' + id,
             type: 'PUT',
             headers: { 'Authorization': localStorage.getItem('user_token') },
-            data: galleryItem,
-            processData: false,
-            contentType: false,
+            data: JSON.stringify(meetup),
+            contentType: 'application/json',
             success,
             error
         });
     },
-    deleteGalleryItem: function(id, success, error) {
+    deleteMeetup: function(id, success, error) {
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + 'gallery/' + id,
+            url: Constants.PROJECT_BASE_URL + 'meetups/' + id,
             type: 'DELETE',
             headers: { 'Authorization': localStorage.getItem('user_token') },
             success,
@@ -54,4 +52,4 @@ const GalleryService = {
     }
 };
 
-export default GalleryService;
+export default MeetupService; 

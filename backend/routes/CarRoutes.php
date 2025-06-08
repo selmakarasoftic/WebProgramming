@@ -63,11 +63,35 @@ Flight::route('GET /cars/@id', function ($id) {
  * )
  */
 Flight::route('POST /cars', function () {
-    $data = Flight::request()->data->getData();
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
+
+    $data = $_POST; // Get form fields
+    $image_url = null;
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $targetDir = __DIR__ . "/../../frontend/assets/images/";
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $fileName = uniqid() . '_' . basename($_FILES["image"]["name"]);
+        $targetFilePath = $targetDir . $fileName;
+
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetFilePath)) {
+            $image_url = "assets/images/" . $fileName;
+        } else {
+            Flight::json(["success" => false, "message" => "Failed to upload image"]);
+            return;
+        }
+    }
+
+    $data['image_url'] = $image_url;
+
+    // Now pass $data to your service to save in the database
+    $result = Flight::carService()->createCar($data);
+
     Flight::json([
-        "success" => Flight::carService()->createCar($data),
-        "message" => "Car created successfully"
+        "success" => $result,
+        "message" => $result ? "Car created successfully" : "Failed to create car"
     ]);
 });
 
@@ -98,7 +122,73 @@ Flight::route('POST /cars', function () {
  */
 Flight::route('PUT /cars/@id', function ($id) {
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::GUEST]);
-    $data = Flight::request()->data->getData();
+
+    $data = [];
+    $image_url = null;
+
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    if (strpos($contentType, 'multipart/form-data') !== false) {
+        // Manually parse multipart/form-data for PUT requests
+        $matches = [];
+        preg_match('/boundary=(.*)$/', $contentType, $matches);
+        $boundary = $matches[1] ?? null;
+
+        if ($boundary) {
+            $input = file_get_contents('php://input');
+            $parts = array_slice(explode('--' . $boundary, $input), 1);
+            
+            foreach ($parts as $part) {
+                if (empty($part) || $part == '--\r\n') continue;
+
+                $segments = explode("\r\n\r\n", $part, 2);
+                if (count($segments) < 2) continue; // Skip if headers and body are not clearly separated
+
+                list($headers, $body) = $segments;
+                $headers = explode("\r\n", $headers);
+                
+                $name = null;
+                $filename = null;
+
+                foreach ($headers as $header) {
+                    if (strpos($header, 'Content-Disposition:') !== false) {
+                        preg_match('/name="([^"]+)"/', $header, $nameMatches);
+                        $name = $nameMatches[1] ?? null;
+                        preg_match('/filename="([^"]+)"/', $header, $filenameMatches);
+                        $filename = $filenameMatches[1] ?? null;
+                    }
+                }
+
+                if ($name === 'image' && $filename) {
+                    // Handle image upload
+                    $targetDir = __DIR__ . "/../../frontend/assets/images/";
+                    if (!file_exists($targetDir)) {
+                        mkdir($targetDir, 0777, true);
+                    }
+                    $fileName = uniqid() . '_' . basename($filename);
+                    $targetFilePath = $targetDir . $fileName;
+                    
+                    // Save the image data
+                    if (file_put_contents($targetFilePath, rtrim($body, "\r\n"))) {
+                        $image_url = "assets/images/" . $fileName;
+                    } else {
+                        Flight::json(["success" => false, "message" => "Failed to upload image"]);
+                        return;
+                    }
+                } elseif ($name) {
+                    // Handle other form fields
+                    $data[$name] = rtrim($body, "\r\n");
+                }
+            }
+        }
+    } else {
+        // For JSON or other content types, use Flight's default data parsing
+        $data = Flight::request()->data->getData();
+    }
+
+    if ($image_url) {
+        $data['image_url'] = $image_url;
+    }
+
     $rows = Flight::carService()->updateCar($id, $data);
 
     Flight::json([

@@ -36,7 +36,8 @@ class CarService extends BaseService {
 
     // update - može preko BaseService::update()
     public function updateCar($id, $data) {
-        return $this->update($id, $data); // koristi BaseService::update()
+        // Ensure $id is an integer for database operations
+        return $this->update((int)$id, $data); // koristi BaseService::update()
     }
 
     // delete - može preko BaseService::delete()

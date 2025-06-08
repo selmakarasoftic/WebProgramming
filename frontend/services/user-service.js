@@ -52,6 +52,7 @@ const UserService = {
                     
                     //sacuvaj i data
                     const userData = {
+                        id: result.data.id,
                         username: result.data.username,
                         role: result.data.role,
                         email: result.data.email
@@ -183,9 +184,9 @@ const UserService = {
             navItems += '<a href="#gallery">Gallery</a>';
             navItems += '<a href="#profile">Profile</a>';
             
-            // Admin specific menu items
-            if (user.role === Constants.ADMIN_ROLE) {
-                navItems += '<a href="#users">Admin Panel</a>';
+            // Admin specific menu items - only show if role is exactly "admin"
+            if (user.role === "admin") {
+                navItems += '<a href="#users" class="admin-only">Admin Panel</a>';
             }
             
             // Logout button for all users
@@ -203,6 +204,16 @@ const UserService = {
             localStorage.clear();
             window.location.replace("pages/login.html");
         }
+    },
+
+    getAllUsers: function(success, error) {
+        $.ajax({
+            url: Constants.PROJECT_BASE_URL + 'users',
+            type: 'GET',
+            headers: { 'Authorization': localStorage.getItem('user_token') },
+            success,
+            error
+        });
     }
 };
 

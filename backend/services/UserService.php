@@ -42,7 +42,16 @@ class UserService extends BaseService {
         return $this->dao->updateUser($id, $data);
     }
 
-    public function changePassword($id, $newPassword) {
+    public function changePassword($id, $oldPassword, $newPassword) {
+        $user = $this->dao->getUserById($id);
+        if (!$user) {
+            throw new Exception("User not found.");
+        }
+
+        if (!password_verify($oldPassword, $user['password'])) {
+            throw new Exception("Old password is incorrect.");
+        }
+
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         return $this->dao->changePassword($id, $hashedPassword);
     }

@@ -10,6 +10,13 @@ $(document).ready(function () {
             appDiv.style.display = "block";
         }
 
+        // Initialize UserService which will handle navigation
+        if (window.UserService) {
+            window.UserService.init();
+        } else {
+            console.error("UserService not found!");
+        }
+
         if (!window.location.hash || window.location.hash === "#") {
             window.location.hash = "#home";
         }
