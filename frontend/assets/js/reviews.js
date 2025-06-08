@@ -213,7 +213,49 @@ function deleteReview(id) {
     );
 }
 
-$(document).on("spapp:ready", function () {
+$(document).ready(function() {
+    // Initialize form validation
+    $("#review-form").validate({
+        rules: {
+            reviewTitle: {
+                required: true,
+                minlength: 3
+            },
+            reviewContent: {
+                required: true,
+                minlength: 10
+            },
+            reviewRating: {
+                required: true,
+                number: true,
+                min: 1,
+                max: 5
+            }
+        },
+        messages: {
+            reviewTitle: {
+                required: "Please enter a title for your review",
+                minlength: "Title must be at least 3 characters long"
+            },
+            reviewContent: {
+                required: "Please write your review",
+                minlength: "Review must be at least 10 characters long"
+            },
+            reviewRating: {
+                required: "Please select a rating",
+                number: "Please enter a valid number",
+                min: "Rating must be at least 1",
+                max: "Rating cannot be more than 5"
+            }
+        },
+        submitHandler: function(form) {
+            event.preventDefault();
+            addReview();
+            return false;
+        }
+    });
+
+    // Initialize reviews page
     if (window.location.hash === "#reviews") {
         initReviews();
     }

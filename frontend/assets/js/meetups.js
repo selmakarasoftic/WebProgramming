@@ -217,7 +217,51 @@ function deleteMeetup(id) {
     );
 }
 
-$(document).on("spapp:ready", function () {
+$(document).ready(function() {
+    // Initialize form validation
+    $("#meetup-form").validate({
+        rules: {
+            meetupTitle: {
+                required: true,
+                minlength: 3
+            },
+            meetupDescription: {
+                required: true,
+                minlength: 10
+            },
+            meetupDate: {
+                required: true,
+                date: true
+            },
+            meetupLocation: {
+                required: true
+            }
+        },
+        messages: {
+            meetupTitle: {
+                required: "Please enter a title for the meetup",
+                minlength: "Title must be at least 3 characters long"
+            },
+            meetupDescription: {
+                required: "Please provide a description",
+                minlength: "Description must be at least 10 characters long"
+            },
+            meetupDate: {
+                required: "Please select a date",
+                date: "Please enter a valid date"
+            },
+            meetupLocation: {
+                required: "Please enter a location"
+            }
+        },
+        submitHandler: function(form) {
+            event.preventDefault();
+            addMeetup();
+            return false;
+        }
+    });
+
+    // Initialize meetups page
     if (window.location.hash === "#meetups") {
         initMeetups();
     }

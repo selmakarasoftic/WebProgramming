@@ -275,6 +275,64 @@ function updateCar(carId) {
 
 // Initialize cars page when hash changes
 $(document).ready(function() {
+    // Initialize form validation
+    $("#car-form").validate({
+        rules: {
+            model: {
+                required: true,
+                minlength: 2
+            },
+            year: {
+                required: true,
+                number: true,
+                min: 1900,
+                max: new Date().getFullYear()
+            },
+            engine: {
+                required: true
+            },
+            horsepower: {
+                required: true,
+                number: true,
+                min: 1
+            },
+            image: {
+                required: true,
+                accept: "image/*"
+            }
+        },
+        messages: {
+            model: {
+                required: "Please enter the car model",
+                minlength: "Model name must be at least 2 characters long"
+            },
+            year: {
+                required: "Please enter the year",
+                number: "Please enter a valid year",
+                min: "Year must be 1900 or later",
+                max: "Year cannot be in the future"
+            },
+            engine: {
+                required: "Please enter the engine type"
+            },
+            horsepower: {
+                required: "Please enter the horsepower",
+                number: "Please enter a valid number",
+                min: "Horsepower must be greater than 0"
+            },
+            image: {
+                required: "Please select an image",
+                accept: "Please select a valid image file"
+            }
+        },
+        submitHandler: function(form) {
+            event.preventDefault();
+            addNewCar();
+            return false;
+        }
+    });
+
+    // Initialize cars page
     if (window.location.hash === "#cars") {
         initCars();
     }
