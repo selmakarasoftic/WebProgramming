@@ -3,6 +3,7 @@
 // Set CORS headers at the very beginning to ensure they are sent before any output
 // cors.php
 $allowedOrigins = [
+    "https://king-prawn-app-vy3pu.ondigitalocean.app/",
     "https://king-prawn-app-vy3pu.ondigitalocean.app",
     "http://127.0.0.1:5501"
 ];
