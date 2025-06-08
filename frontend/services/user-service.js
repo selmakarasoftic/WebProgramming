@@ -37,7 +37,7 @@ const UserService = {
         console.log("Attempting login with:", entity);
 
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + "/login",
+            url: Constants.PROJECT_BASE_URL + "/auth/login",
             type: "POST",
             data: JSON.stringify(entity),
             contentType: "application/json",
@@ -100,7 +100,7 @@ const UserService = {
         console.log("Attempting registration with:", entity);
 
         $.ajax({
-            url: Constants.PROJECT_BASE_URL + "/register",
+            url: Constants.PROJECT_BASE_URL + "/auth/register",
             type: "POST",
             data: JSON.stringify(entity),
             contentType: "application/json",
